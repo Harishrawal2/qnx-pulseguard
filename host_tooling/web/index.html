@@ -46,25 +46,19 @@
       background-attachment: fixed;
     }
 
-    /* Ambient card corner glows matching reference image exactly */
     .card-glow-cyan {
-      position: relative;
       background: radial-gradient(circle at 100% 100%, rgba(0, 242, 254, 0.12) 0%, transparent 60%), #0a101d;
     }
     .card-glow-green {
-      position: relative;
       background: radial-gradient(circle at 100% 100%, rgba(16, 185, 129, 0.12) 0%, transparent 60%), #0a101d;
     }
     .card-glow-blue {
-      position: relative;
       background: radial-gradient(circle at 100% 100%, rgba(14, 165, 233, 0.12) 0%, transparent 60%), #0a101d;
     }
     .card-glow-purple {
-      position: relative;
       background: radial-gradient(circle at 100% 100%, rgba(168, 85, 247, 0.12) 0%, transparent 60%), #0a101d;
     }
 
-    /* Curved neon ribbon wave in hero header */
     .hero-light-streak {
       position: absolute;
       right: -20px;
@@ -72,8 +66,7 @@
       bottom: 0;
       width: 480px;
       pointer-events: none;
-      background: 
-        radial-gradient(ellipse at 80% 50%, rgba(0, 242, 254, 0.22) 0%, rgba(59, 130, 246, 0.12) 40%, transparent 70%);
+      background: radial-gradient(ellipse at 80% 50%, rgba(0, 242, 254, 0.22) 0%, rgba(59, 130, 246, 0.12) 40%, transparent 70%);
       filter: blur(24px);
     }
   </style>
@@ -82,13 +75,12 @@
 
   <div class="max-w-[1600px] mx-auto space-y-4">
 
-    <!-- Top Navigation Bar (Pixel-Matched to Screenshot) -->
+    <!-- Top Navigation Bar -->
     <header class="bg-[#080d19] border border-[#152136] rounded-2xl px-5 py-3 flex items-center justify-between shadow-2xl shadow-black/50">
       
       <!-- Left: Brand Logo + SDP 8.0 Badge + Separator + Nav Tabs -->
       <div class="flex items-center gap-4 md:gap-6">
         
-        <!-- Logo & Title -->
         <div class="flex items-center gap-3">
           <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-cyan-400 via-sky-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/30">
             <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -97,51 +89,50 @@
           </div>
           <span class="text-[15px] font-bold tracking-tight text-white font-sans">QNX PulseGuard</span>
           
-          <!-- SDP 8.0 Badge in Navbar (Right next to QNX PulseGuard) -->
           <span class="px-2.5 py-0.5 text-[11px] font-mono font-bold text-sky-400 bg-sky-950/60 border border-sky-700/70 rounded-md">
             SDP 8.0
           </span>
         </div>
 
-        <!-- Vertical Separator Line -->
         <div class="h-5 w-[1px] bg-slate-800 hidden md:block"></div>
 
-        <!-- Nav Tabs -->
-        <nav class="hidden md:flex items-center gap-4 lg:gap-6 text-xs">
-          <!-- Active Monitoring Tab (Glowing Blue-Bordered Pill) -->
-          <button class="flex items-center gap-2 px-4 py-1.5 rounded-xl bg-gradient-to-b from-cyan-950/80 to-[#0c182d] text-cyan-300 border border-cyan-400/70 shadow-lg shadow-cyan-500/20 font-semibold">
+        <!-- Interactive Nav Tabs -->
+        <nav class="hidden md:flex items-center gap-2 text-xs">
+          <button id="tab-btn-monitoring" onclick="switchTab('monitoring')" class="flex items-center gap-2 px-4 py-1.5 rounded-xl bg-gradient-to-b from-cyan-950/80 to-[#0c182d] text-cyan-300 border border-cyan-400/70 shadow-lg shadow-cyan-500/20 font-semibold transition-all">
             <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
             <span>Monitoring</span>
           </button>
           
-          <!-- Analysis Tab -->
-          <button onclick="scrollToSection('task-section')" class="flex items-center gap-2 text-slate-300 hover:text-white transition-colors font-medium">
+          <button id="tab-btn-analysis" onclick="switchTab('analysis')" class="flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/40 transition-all font-medium">
             <svg class="w-3.5 h-3.5 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 12-8.58 3.91a2 2 0 0 1-1.66 0L2 12"/><path d="m22 17-8.58 3.91a2 2 0 0 1-1.66 0L2 17"/></svg>
-            <span>Analysis</span>
+            <span>Analysis & IPC Bench</span>
           </button>
 
-          <!-- Reports Tab -->
-          <button onclick="downloadFormalAuditReport()" class="flex items-center gap-2 text-slate-300 hover:text-white transition-colors font-medium">
+          <button id="tab-btn-reports" onclick="switchTab('reports')" class="flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/40 transition-all font-medium">
             <svg class="w-3.5 h-3.5 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-            <span>Reports</span>
+            <span>Reports & Evidence</span>
           </button>
 
-          <!-- Configuration Tab -->
-          <button onclick="scrollToSection('evidence-section')" class="flex items-center gap-2 text-slate-300 hover:text-white transition-colors font-medium">
+          <button id="tab-btn-configuration" onclick="switchTab('configuration')" class="flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/40 transition-all font-medium">
             <svg class="w-3.5 h-3.5 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-            <span>Configuration</span>
+            <span>Configuration & Diagnostics</span>
           </button>
         </nav>
       </div>
 
-
+      <!-- Right: Explicit Data Mode Badge (Phase 5 Requirement) -->
+      <div class="flex items-center gap-3">
+        <div id="data-mode-badge" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-sky-950/70 border border-sky-500/50 text-sky-300 text-xs font-mono font-bold shadow-sm">
+          <span class="w-2 h-2 rounded-full bg-sky-400"></span>
+          <span id="data-mode-text">DEMO MODE (Calibrated SDP 8.0 Model)</span>
+        </div>
+      </div>
 
     </header>
 
-    <!-- Hero Header & Specifications Section (Exact Match) -->
+    <!-- Hero Header & Specifications Section -->
     <section class="bg-[#080d19] border border-[#152136] rounded-2xl p-6 relative overflow-hidden shadow-2xl shadow-black/50">
       
-      <!-- Ambient light streak & glowing curved ribbon -->
       <div class="hero-light-streak"></div>
       <svg class="absolute right-0 top-0 h-full w-[460px] pointer-events-none opacity-45" viewBox="0 0 460 160" fill="none">
         <path d="M0 110 C 180 160, 300 20, 460 75" stroke="url(#cyan-ribbon-grad)" stroke-width="3.5" stroke-linecap="round"/>
@@ -162,11 +153,9 @@
 
       <div class="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
         
-        <!-- Left: Accent Bar + Title + Subtitle + Action Buttons -->
         <div class="space-y-4">
           <div>
             <div class="flex items-center gap-3">
-              <!-- Left vertical cyan accent bar -->
               <div class="w-1.5 h-8 bg-cyan-400 rounded-full shadow-lg shadow-cyan-400/70"></div>
               <h1 class="text-2xl md:text-3xl font-extrabold text-white tracking-tight">QNX PulseGuard</h1>
             </div>
@@ -175,22 +164,17 @@
             </p>
           </div>
 
-          <!-- Action Buttons Row -->
           <div class="flex flex-wrap items-center gap-3 pt-1">
-            
-            <!-- Button 1: Stream Active -->
             <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#0a231b] border border-emerald-500/80 text-emerald-400 text-xs font-mono font-semibold shadow-sm">
               <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
               <span>STREAM ACTIVE (10.0 Hz)</span>
             </div>
 
-            <!-- Button 2: Simulate CPU Contention -->
             <button onclick="triggerSyntheticStress()" id="btn-contention" class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#131b2e] hover:bg-[#1a253e] text-slate-200 border border-slate-700/80 text-xs font-semibold transition-all shadow-sm">
               <svg class="w-3.5 h-3.5 text-slate-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
               <span>Simulate CPU Contention</span>
             </button>
 
-            <!-- Button 3: Export ISO 26262 Audit -->
             <button onclick="downloadFormalAuditReport()" class="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-gradient-to-r from-cyan-500 via-sky-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white text-xs font-bold shadow-lg shadow-cyan-500/30 transition-all">
               <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
               <span>Export ISO 26262 Audit</span>
@@ -198,10 +182,7 @@
           </div>
         </div>
 
-        <!-- Right: Hardware & Kernel Specs Row (Exact Match) -->
         <div class="flex flex-wrap items-center gap-8 lg:gap-12 text-xs">
-          
-          <!-- Spec 1: Profile -->
           <div class="flex items-center gap-3">
             <div class="text-cyan-400">
               <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg>
@@ -212,7 +193,6 @@
             </div>
           </div>
 
-          <!-- Spec 2: Clock -->
           <div class="flex items-center gap-3">
             <div class="text-emerald-400">
               <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
@@ -223,7 +203,6 @@
             </div>
           </div>
 
-          <!-- Spec 3: Chip / Core -->
           <div class="flex items-center gap-3">
             <div class="text-cyan-400">
               <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 12-8.58 3.91a2 2 0 0 1-1.66 0L2 12"/><path d="m22 17-8.58 3.91a2 2 0 0 1-1.66 0L2 17"/></svg>
@@ -233,90 +212,88 @@
               <div class="font-mono font-semibold text-white text-xs">ChID: 1 / CoID: 1</div>
             </div>
           </div>
-
         </div>
 
       </div>
     </section>
 
-    <!-- 4 Executive KPI Cards Row (Exact Corner Glows & Typography) -->
-    <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <!-- TAB VIEW 1: MONITORING (Default Overview) -->
+    <div id="view-monitoring" class="space-y-4">
       
-      <!-- Card 1: 99.9th % Timing Jitter (Cyan Glow) -->
-      <div class="border border-[#152136] rounded-2xl p-5 card-glow-cyan shadow-xl">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-2">
-            <div class="w-6 h-6 rounded-md bg-cyan-500/10 flex items-center justify-center text-cyan-400">
-              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+      <!-- 4 Executive KPI Cards Row -->
+      <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+        <div class="border border-[#152136] rounded-2xl p-5 card-glow-cyan shadow-xl">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <div class="w-6 h-6 rounded-md bg-cyan-500/10 flex items-center justify-center text-cyan-400">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+              </div>
+              <span class="text-[11px] font-bold text-slate-300 tracking-wider uppercase">99.9th % Timing Jitter</span>
             </div>
-            <span class="text-[11px] font-bold text-slate-300 tracking-wider uppercase">99.9th % Timing Jitter</span>
+            <span class="px-2.5 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-950 text-emerald-400 border border-emerald-500/50">
+              PASS
+            </span>
           </div>
-          <span class="px-2.5 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-950 text-emerald-400 border border-emerald-500/50">
-            PASS
-          </span>
+          <div class="mt-3 flex items-baseline gap-1.5">
+            <span class="text-3xl md:text-4xl font-extrabold font-mono text-white tracking-tight" id="val-jitter">0.95</span>
+            <span class="text-sm font-mono text-slate-400">µs</span>
+          </div>
+          <div class="mt-2.5 flex items-center gap-1.5 text-xs text-emerald-400 font-medium">
+            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            <span>Sub-2.00 µs bound guaranteed</span>
+          </div>
         </div>
-        <div class="mt-3 flex items-baseline gap-1.5">
-          <span class="text-3xl md:text-4xl font-extrabold font-mono text-white tracking-tight" id="val-jitter">0.95</span>
-          <span class="text-sm font-mono text-slate-400">µs</span>
-        </div>
-        <div class="mt-2.5 flex items-center gap-1.5 text-xs text-emerald-400 font-medium">
-          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-          <span>Sub-2.00 µs bound guaranteed</span>
-        </div>
-      </div>
 
-      <!-- Card 2: ASIL-D Deadline Breaches (Emerald Glow) -->
-      <div class="border border-[#152136] rounded-2xl p-5 card-glow-green shadow-xl">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-2">
-            <div class="w-6 h-6 rounded-md bg-emerald-500/10 flex items-center justify-center text-emerald-400">
-              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <div class="border border-[#152136] rounded-2xl p-5 card-glow-green shadow-xl">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <div class="w-6 h-6 rounded-md bg-emerald-500/10 flex items-center justify-center text-emerald-400">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              </div>
+              <span class="text-[11px] font-bold text-slate-300 tracking-wider uppercase">ASIL-D Deadline Breaches</span>
             </div>
-            <span class="text-[11px] font-bold text-slate-300 tracking-wider uppercase">ASIL-D Deadline Breaches</span>
+            <span class="px-2.5 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-950 text-emerald-400 border border-emerald-500/50">
+              0 FAILURES
+            </span>
           </div>
-          <span class="px-2.5 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-950 text-emerald-400 border border-emerald-500/50">
-            0 FAILURES
-          </span>
+          <div class="mt-3 flex items-baseline gap-1.5">
+            <span class="text-3xl md:text-4xl font-extrabold font-mono text-white tracking-tight" id="val-misses">0</span>
+            <span class="text-sm font-mono text-slate-400">events</span>
+          </div>
+          <div class="mt-2.5 flex items-center gap-1.5 text-xs text-emerald-400 font-medium">
+            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            <span>100.0% Deterministic Safety Bound</span>
+          </div>
         </div>
-        <div class="mt-3 flex items-baseline gap-1.5">
-          <span class="text-3xl md:text-4xl font-extrabold font-mono text-white tracking-tight" id="val-misses">0</span>
-          <span class="text-sm font-mono text-slate-400">events</span>
-        </div>
-        <div class="mt-2.5 flex items-center gap-1.5 text-xs text-emerald-400 font-medium">
-          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-          <span>100.0% Deterministic Safety Bound</span>
-        </div>
-      </div>
 
-      <!-- Card 3: Worst-Case Execution (WCET) (Cyan Glow) -->
-      <div class="border border-[#152136] rounded-2xl p-5 card-glow-blue shadow-xl">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-2">
-            <div class="w-6 h-6 rounded-md bg-cyan-500/10 flex items-center justify-center text-cyan-400">
-              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <div class="border border-[#152136] rounded-2xl p-5 card-glow-blue shadow-xl">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <div class="w-6 h-6 rounded-md bg-cyan-500/10 flex items-center justify-center text-cyan-400">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </div>
+              <span class="text-[11px] font-bold text-slate-300 tracking-wider uppercase">Worst-Case Execution (WCET)</span>
             </div>
-            <span class="text-[11px] font-bold text-slate-300 tracking-wider uppercase">Worst-Case Execution (WCET)</span>
+            <span class="px-2.5 py-0.5 rounded text-[10px] font-mono font-bold bg-cyan-950 text-cyan-400 border border-cyan-500/50">
+              ASIL-D
+            </span>
           </div>
-          <span class="px-2.5 py-0.5 rounded text-[10px] font-mono font-bold bg-cyan-950 text-cyan-400 border border-cyan-500/50">
-            ASIL-D
-          </span>
+          <div class="mt-3 flex items-baseline gap-1.5">
+            <span class="text-3xl md:text-4xl font-extrabold font-mono text-white tracking-tight" id="val-wcet">17.8</span>
+            <span class="text-sm font-mono text-slate-400">µs</span>
+          </div>
+          <div class="mt-2.5 flex items-center gap-1.5 text-xs text-slate-400 font-medium">
+            <svg class="w-3.5 h-3.5 text-cyan-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            <span>Headroom: 98.22% of 1000 µs budget</span>
+          </div>
         </div>
-        <div class="mt-3 flex items-baseline gap-1.5">
-          <span class="text-3xl md:text-4xl font-extrabold font-mono text-white tracking-tight" id="val-wcet">17.8</span>
-          <span class="text-sm font-mono text-slate-400">µs</span>
-        </div>
-        <div class="mt-2.5 flex items-center gap-1.5 text-xs text-slate-400 font-medium">
-          <svg class="w-3.5 h-3.5 text-cyan-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-          <span>Headroom: 98.22% of 1000 µs budget</span>
-        </div>
-      </div>
 
-      <!-- Card 4: Scheduler Preemptions (Purple Glow) -->
-      <div class="border border-[#152136] rounded-2xl p-5 card-glow-purple shadow-xl">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-2">
-            <div class="w-6 h-6 rounded-md bg-indigo-500/10 flex items-center justify-center text-indigo-400">
-              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 12-8.58 3.91a2 2 0 0 1-1.66 0L2 12"/><path d="m22 17-8.58 3.91a2 2 0 0 1-1.66 0L2 17"/></svg>
+        <div class="border border-[#152136] rounded-2xl p-5 card-glow-purple shadow-xl">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <div class="w-6 h-6 rounded-md bg-indigo-500/10 flex items-center justify-center text-indigo-400">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 12-8.58 3.91a2 2 0 0 1-1.66 0L2 12"/><path d="m22 17-8.58 3.91a2 2 0 0 1-1.66 0L2 17"/></svg>
             </div>
             <span class="text-[11px] font-bold text-slate-300 tracking-wider uppercase">Scheduler Preemptions</span>
           </div>
@@ -334,186 +311,283 @@
         </div>
       </div>
 
-    </section>
+      </section>
 
-    <!-- Two Main Charts Section (Exact Match to Screenshot) -->
-    <section class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <!-- Two Main Charts Section -->
+      <section class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        
+        <div class="lg:col-span-2 bg-[#0a101d] border border-[#152136] rounded-2xl p-5 shadow-xl">
+          <div class="flex flex-wrap items-center justify-between gap-2 pb-3">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-lg bg-cyan-500/10 flex items-center justify-center text-cyan-400">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+              </div>
+              <div>
+                <h2 class="text-sm font-bold text-white">Real-Time Task Execution Latency (Waterfall)</h2>
+                <p class="text-[11px] text-slate-400">Per-task execution latency over time</p>
+              </div>
+            </div>
+            <div class="text-[11px] font-mono text-slate-400 bg-slate-900/80 px-2.5 py-1 rounded border border-slate-800">
+              Source: SYSPAGE_ENTRY(qtime)
+            </div>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-3 pt-2 pb-2 text-[11px]">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0d1527] border border-slate-800 text-slate-300">
+              <span class="w-2.5 h-2.5 rounded-sm bg-red-500"></span>
+              <span>BrakeByWire (ASIL-D, 1000 µs)</span>
+            </div>
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0d1527] border border-slate-800 text-slate-300">
+              <span class="w-2.5 h-2.5 rounded-sm bg-amber-400"></span>
+              <span>SteeringAngle (ASIL-B, 5000 µs)</span>
+            </div>
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0d1527] border border-slate-800 text-slate-300">
+              <span class="w-2.5 h-2.5 rounded-sm bg-cyan-400"></span>
+              <span>Telematics GW (Best-Effort, 20000 µs)</span>
+            </div>
+          </div>
+
+          <div class="h-[270px] relative w-full pt-2">
+            <canvas id="chartLatencyWaterfall"></canvas>
+          </div>
+        </div>
+
+        <div class="bg-[#0a101d] border border-[#152136] rounded-2xl p-5 shadow-xl">
+          <div class="flex items-center justify-between pb-3">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-lg bg-cyan-500/10 flex items-center justify-center text-cyan-400">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+              </div>
+              <div>
+                <h2 class="text-sm font-bold text-white">Jitter Distribution (Gaussian)</h2>
+                <p class="text-[11px] text-slate-400">Distribution of timing jitter across executions</p>
+              </div>
+            </div>
+            <span class="text-[11px] font-mono text-slate-400 bg-slate-900/80 px-2.5 py-1 rounded border border-slate-800">
+              Nominal ± 0.4 µs
+            </span>
+          </div>
+
+          <div class="h-[305px] relative w-full pt-3">
+            <canvas id="chartJitterHistogram"></canvas>
+          </div>
+        </div>
+
+      </section>
+
+    </div>
+
+    <!-- TAB VIEW 2: ANALYSIS & IPC BENCHMARK -->
+    <div id="view-analysis" class="space-y-4 hidden">
       
-      <!-- Left Chart: Real-Time Task Execution Latency (Waterfall) (2 cols) -->
-      <div class="lg:col-span-2 bg-[#0a101d] border border-[#152136] rounded-2xl p-5 shadow-xl">
-        
-        <!-- Header -->
-        <div class="flex flex-wrap items-center justify-between gap-2 pb-3">
-          <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-lg bg-cyan-500/10 flex items-center justify-center text-cyan-400">
-              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
-            </div>
-            <div>
-              <h2 class="text-sm font-bold text-white">Real-Time Task Execution Latency (Waterfall)</h2>
-              <p class="text-[11px] text-slate-400">Per-task execution latency over time</p>
-            </div>
+      <!-- Autonomous Vehicle Real-Time Task Matrix -->
+      <section class="bg-[#0a101d] border border-[#152136] rounded-2xl p-5 shadow-xl">
+        <div class="flex flex-wrap items-center justify-between pb-3 border-b border-slate-800/80 gap-2">
+          <div class="flex items-center gap-2.5">
+            <svg class="w-4 h-4 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/><path d="M15 3v18"/></svg>
+            <h2 class="text-sm font-bold text-white">Autonomous Vehicle Real-Time Task Matrix (Configured Workloads)</h2>
           </div>
-          <div class="text-[11px] font-mono text-slate-400 bg-slate-900/80 px-2.5 py-1 rounded border border-slate-800">
-            Source: SYSPAGE_ENTRY(qtime)
-          </div>
-        </div>
-
-        <!-- Legend Pills (Exact Alignment) -->
-        <div class="flex flex-wrap items-center gap-3 pt-2 pb-2 text-[11px]">
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0d1527] border border-slate-800 text-slate-300">
-            <span class="w-2.5 h-2.5 rounded-sm bg-red-500"></span>
-            <span>BrakeByWire (ASIL-D, 1000 µs)</span>
-          </div>
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0d1527] border border-slate-800 text-slate-300">
-            <span class="w-2.5 h-2.5 rounded-sm bg-amber-400"></span>
-            <span>SteeringAngle (ASIL-B, 5000 µs)</span>
-          </div>
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0d1527] border border-slate-800 text-slate-300">
-            <span class="w-2.5 h-2.5 rounded-sm bg-cyan-400"></span>
-            <span>Telematics GW (Best-Effort, 20000 µs)</span>
-          </div>
-        </div>
-
-        <!-- Latency Chart Canvas -->
-        <div class="h-[270px] relative w-full pt-2">
-          <canvas id="chartLatencyWaterfall"></canvas>
-        </div>
-      </div>
-
-      <!-- Right Chart: Jitter Distribution (Gaussian) (1 col) -->
-      <div class="bg-[#0a101d] border border-[#152136] rounded-2xl p-5 shadow-xl">
-        
-        <!-- Header -->
-        <div class="flex items-center justify-between pb-3">
-          <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-lg bg-cyan-500/10 flex items-center justify-center text-cyan-400">
-              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
-            </div>
-            <div>
-              <h2 class="text-sm font-bold text-white">Jitter Distribution (Gaussian)</h2>
-              <p class="text-[11px] text-slate-400">Distribution of timing jitter across executions</p>
-            </div>
-          </div>
-          <span class="text-[11px] font-mono text-slate-400 bg-slate-900/80 px-2.5 py-1 rounded border border-slate-800">
-            Nominal ± 0.4 µs
+          <span class="text-xs font-mono text-cyan-400 bg-cyan-950/40 px-2.5 py-1 rounded-md border border-cyan-800/60">
+            Standard: ISO 26262 ASIL-D Reference Model
           </span>
         </div>
 
-        <!-- Histogram Chart Canvas -->
-        <div class="h-[305px] relative w-full pt-3">
-          <canvas id="chartJitterHistogram"></canvas>
+        <div class="mt-4 overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead>
+              <tr class="bg-slate-950/80 text-slate-400 border-b border-slate-800 font-semibold uppercase tracking-wider text-[11px]">
+                <th class="py-3 px-4">Task Subsystem</th>
+                <th class="py-3 px-4">Criticality</th>
+                <th class="py-3 px-4">Scheduler & Priority</th>
+                <th class="py-3 px-4">Target Period (T)</th>
+                <th class="py-3 px-4">Current Latency</th>
+                <th class="py-3 px-4">WCET</th>
+                <th class="py-3 px-4">ACET</th>
+                <th class="py-3 px-4">Budget Utilization</th>
+                <th class="py-3 px-4">Breaches</th>
+                <th class="py-3 px-4">Status</th>
+              </tr>
+            </thead>
+            <tbody id="task-matrix-body" class="divide-y divide-slate-800/60 font-mono">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
         </div>
-      </div>
+      </section>
 
-    </section>
-
-    <!-- Automotive ECU Tasks Matrix Table Section (Retained for full hackathon depth) -->
-    <section id="task-section" class="bg-[#0a101d] border border-[#152136] rounded-2xl p-5 shadow-xl">
-      <div class="flex flex-wrap items-center justify-between pb-3 border-b border-slate-800/80 gap-2">
-        <div class="flex items-center gap-2.5">
-          <svg class="w-4 h-4 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/><path d="M15 3v18"/></svg>
-          <h2 class="text-sm font-bold text-white">Autonomous Vehicle Real-Time Task Matrix</h2>
-        </div>
-        <span class="text-xs font-mono text-cyan-400 bg-cyan-950/40 px-2.5 py-1 rounded-md border border-cyan-800/60">
-          Standard: ISO 26262 ASIL-D & IEC 62304 Compliance Domain
-        </span>
-      </div>
-
-      <div class="mt-4 overflow-x-auto">
-        <table class="w-full text-left text-xs">
-          <thead>
-            <tr class="bg-slate-950/80 text-slate-400 border-b border-slate-800 font-semibold uppercase tracking-wider text-[11px]">
-              <th class="py-3 px-4">Task Subsystem</th>
-              <th class="py-3 px-4">Criticality</th>
-              <th class="py-3 px-4">Scheduler & Priority</th>
-              <th class="py-3 px-4">Target Period (T)</th>
-              <th class="py-3 px-4">Current Latency</th>
-              <th class="py-3 px-4">WCET</th>
-              <th class="py-3 px-4">ACET</th>
-              <th class="py-3 px-4">Budget Utilization</th>
-              <th class="py-3 px-4">Breaches</th>
-              <th class="py-3 px-4">Verdict</th>
-            </tr>
-          </thead>
-          <tbody id="task-matrix-body" class="divide-y divide-slate-800/60 font-mono">
-            <!-- Dynamic rows populated via JS -->
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- QNX 8.0 Architecture Evidence Section -->
-    <section id="evidence-section" class="bg-[#0a101d] border border-[#152136] rounded-2xl p-5 shadow-xl">
-      <div class="flex items-center gap-2.5 pb-3 border-b border-slate-800/80">
-        <svg class="w-4 h-4 text-cyan-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-        <h2 class="text-sm font-bold text-white">QNX 8.0 Microkernel Architecture & API Verification Evidence</h2>
-        <span class="ml-auto text-xs text-slate-400 font-mono">Verifiable for QNX Global Hackathon Rubric Review</span>
-      </div>
-
-      <div class="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3.5 text-xs">
-        
-        <div class="bg-slate-950/80 border border-slate-800/80 rounded-xl p-3.5 hover:border-cyan-500/40 transition-all">
-          <div class="font-mono font-semibold text-cyan-400 flex items-center gap-1.5">
-            <svg class="w-3.5 h-3.5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-            ChannelCreate() & ConnectAttach()
+      <!-- Synchronous QNX IPC Benchmark Results Table -->
+      <section class="bg-[#0a101d] border border-[#152136] rounded-2xl p-5 shadow-xl">
+        <div class="flex flex-wrap items-center justify-between pb-3 border-b border-slate-800/80 gap-2">
+          <div class="flex items-center gap-2.5">
+            <svg class="w-4 h-4 text-cyan-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            <h2 class="text-sm font-bold text-white">QNX Neutrino Synchronous IPC Benchmark (MsgSend -> MsgReceive -> MsgReply)</h2>
           </div>
-          <p class="mt-2 text-slate-400 leading-relaxed text-[11px]">
-            Allocates synchronous Neutrino kernel channel with side-channel connection (<code class="text-cyan-300">src/qnx_pulseguard.c:92</code>). Delivers sub-microsecond pulse messaging with zero context switch penalty.
-          </p>
+          <button onclick="fetchIpcBenchmark()" class="px-3 py-1 rounded-lg text-xs font-mono font-semibold bg-cyan-950 text-cyan-300 border border-cyan-700/60 hover:bg-cyan-900 transition-all">
+            ↻ Refresh IPC Benchmark
+          </button>
         </div>
 
-        <div class="bg-slate-950/80 border border-slate-800/80 rounded-xl p-3.5 hover:border-cyan-500/40 transition-all">
-          <div class="font-mono font-semibold text-cyan-400 flex items-center gap-1.5">
-            <svg class="w-3.5 h-3.5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-            Hardware ClockCycles() Counter
+        <div class="mt-4 overflow-x-auto">
+          <table class="w-full text-left text-xs font-mono">
+            <thead>
+              <tr class="bg-slate-950/80 text-slate-400 border-b border-slate-800 uppercase tracking-wider text-[11px]">
+                <th class="py-3 px-4">Payload Size</th>
+                <th class="py-3 px-4">Iterations</th>
+                <th class="py-3 px-4">Min Latency</th>
+                <th class="py-3 px-4">Average Latency</th>
+                <th class="py-3 px-4">P95 Latency</th>
+                <th class="py-3 px-4">Max Latency</th>
+                <th class="py-3 px-4">Throughput (Msg/s)</th>
+                <th class="py-3 px-4">Bandwidth (MB/s)</th>
+              </tr>
+            </thead>
+            <tbody id="ipc-bench-body" class="divide-y divide-slate-800/60">
+              <!-- Populated via API -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- TAB VIEW 3: REPORTS & EVIDENCE -->
+    <div id="view-reports" class="space-y-4 hidden">
+      
+      <!-- Export Actions Card -->
+      <section class="bg-[#0a101d] border border-[#152136] rounded-2xl p-5 shadow-xl">
+        <div class="flex items-center gap-2.5 pb-3 border-b border-slate-800/80">
+          <svg class="w-4 h-4 text-cyan-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <h2 class="text-sm font-bold text-white">Performance Evidence & Audit Export Center</h2>
+        </div>
+
+        <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="bg-slate-950/80 border border-slate-800/80 rounded-xl p-4 flex items-center justify-between">
+            <div>
+              <div class="font-bold text-white text-sm">Download JSON Evidence Package</div>
+              <p class="text-slate-400 text-xs mt-1">Complete system metadata, P50-P99.9 latencies, and IPC benchmarks formatted for CI/CD.</p>
+            </div>
+            <button onclick="downloadFormalAuditReport()" class="px-4 py-2 rounded-xl text-xs font-bold bg-cyan-600 hover:bg-cyan-500 text-white transition-all shadow-md">
+              Export JSON
+            </button>
           </div>
-          <p class="mt-2 text-slate-400 leading-relaxed text-[11px]">
-            Reads hardware cycle counter calibrated via <code class="text-cyan-300">SYSPAGE_ENTRY(qtime)->cycles_per_sec</code> (<code class="text-cyan-300">src/qnx_pulseguard.c:42</code>). Delivers deterministic timing without syscall jitter.
-          </p>
-        </div>
 
-        <div class="bg-slate-950/80 border border-slate-800/80 rounded-xl p-3.5 hover:border-cyan-500/40 transition-all">
-          <div class="font-mono font-semibold text-cyan-400 flex items-center gap-1.5">
-            <svg class="w-3.5 h-3.5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-            SCHED_FIFO Priority Preemption
+          <div class="bg-slate-950/80 border border-slate-800/80 rounded-xl p-4 flex items-center justify-between">
+            <div>
+              <div class="font-bold text-white text-sm">Download CSV Time-Series Log</div>
+              <p class="text-slate-400 text-xs mt-1">Raw tabular latency measurements with wall-clock timestamps for MATLAB or Excel.</p>
+            </div>
+            <button onclick="downloadCsvReport()" class="px-4 py-2 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 transition-all">
+              Export CSV
+            </button>
           </div>
-          <p class="mt-2 text-slate-400 leading-relaxed text-[11px]">
-            Binds safety-critical loops to Priority 63 with <code class="text-cyan-300">pthread_setschedparam()</code> (<code class="text-cyan-300">src/main.c:48</code>). Enforces priority inversion protection under heavy stress.
-          </p>
+        </div>
+      </section>
+
+      <!-- QNX 8.0 Architecture Evidence Section -->
+      <section class="bg-[#0a101d] border border-[#152136] rounded-2xl p-5 shadow-xl">
+        <div class="flex items-center gap-2.5 pb-3 border-b border-slate-800/80">
+          <svg class="w-4 h-4 text-cyan-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          <h2 class="text-sm font-bold text-white">QNX 8.0 Microkernel Architecture & API Verification Evidence</h2>
+          <span class="ml-auto text-xs text-slate-400 font-mono">Evaluated for QNX Global Hackathon Rubric Review</span>
         </div>
 
-        <div class="bg-slate-950/80 border border-slate-800/80 rounded-xl p-3.5 hover:border-cyan-500/40 transition-all">
-          <div class="font-mono font-semibold text-cyan-400 flex items-center gap-1.5">
-            <svg class="w-3.5 h-3.5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-            qcc & SDP 8.0 Toolchain
+        <div class="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3.5 text-xs">
+          
+          <div class="bg-slate-950/80 border border-slate-800/80 rounded-xl p-3.5 hover:border-cyan-500/40 transition-all">
+            <div class="font-mono font-semibold text-cyan-400 flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              ChannelCreate() & ConnectAttach()
+            </div>
+            <p class="mt-2 text-slate-400 leading-relaxed text-[11px]">
+              Allocates synchronous Neutrino kernel channel with side-channel connection (<code class="text-cyan-300">src/qnx_pulseguard.c:92</code>). Delivers sub-microsecond pulse messaging with zero context switch penalty.
+            </p>
           </div>
-          <p class="mt-2 text-slate-400 leading-relaxed text-[11px]">
-            Native CMake and Makefile targets configured for QNX Software Development Platform 8.0 toolchains (<code class="text-cyan-300">aarch64le</code> / <code class="text-cyan-300">x86_64</code>), compatible with QEMU and RPi 5.
-          </p>
+
+          <div class="bg-slate-950/80 border border-slate-800/80 rounded-xl p-3.5 hover:border-cyan-500/40 transition-all">
+            <div class="font-mono font-semibold text-cyan-400 flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              Hardware ClockCycles() Counter
+            </div>
+            <p class="mt-2 text-slate-400 leading-relaxed text-[11px]">
+              Reads hardware cycle counter calibrated via <code class="text-cyan-300">SYSPAGE_ENTRY(qtime)->cycles_per_sec</code> (<code class="text-cyan-300">src/qnx_pulseguard.c:42</code>). Delivers deterministic timing without syscall jitter.
+            </p>
+          </div>
+
+          <div class="bg-slate-950/80 border border-slate-800/80 rounded-xl p-3.5 hover:border-cyan-500/40 transition-all">
+            <div class="font-mono font-semibold text-cyan-400 flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              SCHED_FIFO Priority Preemption
+            </div>
+            <p class="mt-2 text-slate-400 leading-relaxed text-[11px]">
+              Binds safety-critical loops to Priority 63 with <code class="text-cyan-300">pthread_setschedparam()</code> (<code class="text-cyan-300">src/main.c:48</code>). Enforces priority inversion protection under heavy stress.
+            </p>
+          </div>
+
+          <div class="bg-slate-950/80 border border-slate-800/80 rounded-xl p-3.5 hover:border-cyan-500/40 transition-all">
+            <div class="font-mono font-semibold text-cyan-400 flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              MsgSend() / MsgReceive() Benchmark
+            </div>
+            <p class="mt-2 text-slate-400 leading-relaxed text-[11px]">
+              Dedicated synchronous IPC latency benchmarker (<code class="text-cyan-300">src/qnx_ipc_bench.c</code>) evaluating round-trip messaging performance across configurable payloads (64B to 16KB).
+            </p>
+          </div>
+
+        </div>
+      </section>
+
+    </div>
+
+    <!-- TAB VIEW 4: CONFIGURATION & DIAGNOSTICS -->
+    <div id="view-configuration" class="space-y-4 hidden">
+      
+      <!-- System Target Diagnostic Card -->
+      <section class="bg-[#0a101d] border border-[#152136] rounded-2xl p-5 shadow-xl">
+        <div class="flex items-center gap-2.5 pb-3 border-b border-slate-800/80">
+          <svg class="w-4 h-4 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+          <h2 class="text-sm font-bold text-white">Target Environment & Connection Diagnostics</h2>
         </div>
 
-      </div>
-    </section>
-
-    <!-- Microkernel Trace Log Terminal Section -->
-    <section class="bg-[#0a101d] border border-[#152136] rounded-2xl p-4 shadow-xl">
-      <div class="flex items-center justify-between pb-2.5 border-b border-slate-800/80">
-        <div class="flex items-center gap-2">
-          <svg class="w-4 h-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
-          <h2 class="text-xs font-bold text-white">QNX Neutrino Kernel Event Trace Stream</h2>
+        <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4 text-xs font-mono">
+          <div class="bg-slate-950/80 border border-slate-800 p-4 rounded-xl">
+            <div class="text-slate-400 text-[11px]">Target Operating System</div>
+            <div class="font-bold text-white text-sm mt-1" id="diag-os">QNX Neutrino RTOS 8.0</div>
+            <div class="text-cyan-400 text-[11px] mt-2">Binary: procnto-smp-instr</div>
+          </div>
+          <div class="bg-slate-950/80 border border-slate-800 p-4 rounded-xl">
+            <div class="text-slate-400 text-[11px]">Telemetry Ingestion Endpoint</div>
+            <div class="font-bold text-white text-sm mt-1">UDP Port 9876 (0.0.0.0)</div>
+            <div class="text-emerald-400 text-[11px] mt-2" id="diag-source">Calibrated SDP 8.0 Model</div>
+          </div>
+          <div class="bg-slate-950/80 border border-slate-800 p-4 rounded-xl">
+            <div class="text-slate-400 text-[11px]">Toolchain Compilation Mode</div>
+            <div class="font-bold text-white text-sm mt-1">qcc (aarch64le / x86_64)</div>
+            <div class="text-amber-400 text-[11px] mt-2">Target Host: QEMU / Hardware</div>
+          </div>
         </div>
-        <span class="text-[11px] font-mono text-slate-400">Channel: /dev/pulseguard • Real-time Microkernel Pulses</span>
-      </div>
-      <div class="mt-3 bg-[#04070e] border border-slate-800/80 rounded-lg p-3.5 font-mono text-xs h-32 overflow-y-auto space-y-1" id="stream-console">
-        <!-- Live event log lines -->
-      </div>
-    </section>
+      </section>
+
+      <!-- Microkernel Trace Log Terminal Section -->
+      <section class="bg-[#0a101d] border border-[#152136] rounded-2xl p-4 shadow-xl">
+        <div class="flex items-center justify-between pb-2.5 border-b border-slate-800/80">
+          <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+            <h2 class="text-xs font-bold text-white">QNX Neutrino Kernel Event Trace Stream</h2>
+          </div>
+          <span class="text-[11px] font-mono text-slate-400">Channel: /dev/pulseguard • Real-time Microkernel Pulses</span>
+        </div>
+        <div class="mt-3 bg-[#04070e] border border-slate-800/80 rounded-lg p-3.5 font-mono text-xs h-36 overflow-y-auto space-y-1" id="stream-console">
+          <!-- Live event log lines -->
+        </div>
+      </section>
+
+    </div>
 
     <!-- Footer -->
     <footer class="pt-2 pb-6 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-500 font-mono border-t border-slate-800/60">
       <div class="flex items-center gap-2">
         <svg class="w-4 h-4 text-cyan-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
-        <span>QNX PulseGuard v1.0.0 • Developed for BlackBerry QNX Global Hackathon</span>
+        <span>QNX PulseGuard v1.0.0 • Developed for BlackBerry QNX Global Hackathon 2026</span>
       </div>
       <div>
         Source Repository: <a href="https://github.com/Harishrawal2/qnx-pulseguard" target="_blank" class="text-cyan-400 hover:text-cyan-300 underline underline-offset-2">github.com/Harishrawal2/qnx-pulseguard</a>
@@ -523,9 +597,23 @@
   </div>
 
   <script>
-    function scrollToSection(id) {
-      const el = document.getElementById(id);
-      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    // Tab switching controller
+    function switchTab(tabId) {
+      const views = ['monitoring', 'analysis', 'reports', 'configuration'];
+      views.forEach(v => {
+        const el = document.getElementById(`view-${v}`);
+        const btn = document.getElementById(`tab-btn-${v}`);
+        if (v === tabId) {
+          el.classList.remove('hidden');
+          btn.className = "flex items-center gap-2 px-4 py-1.5 rounded-xl bg-gradient-to-b from-cyan-950/80 to-[#0c182d] text-cyan-300 border border-cyan-400/70 shadow-lg shadow-cyan-500/20 font-semibold transition-all";
+        } else {
+          el.classList.add('hidden');
+          btn.className = "flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/40 transition-all font-medium";
+        }
+      });
+      if (tabId === 'analysis') {
+        fetchIpcBenchmark();
+      }
     }
 
     const ctxWaterfall = document.getElementById('chartLatencyWaterfall').getContext('2d');
@@ -697,12 +785,49 @@
       }
     }
 
+    async function fetchIpcBenchmark() {
+      try {
+        const res = await fetch('/api/ipc_benchmark');
+        const data = await res.json();
+        const tbody = document.getElementById('ipc-bench-body');
+        if (!tbody) return;
+        tbody.innerHTML = '';
+        data.results.forEach(r => {
+          tbody.innerHTML += `
+            <tr class="hover:bg-slate-800/40 transition-colors">
+              <td class="py-3 px-4 font-bold text-white">${r.payload_bytes} Bytes</td>
+              <td class="py-3 px-4 text-slate-300">${r.iterations.toLocaleString()}</td>
+              <td class="py-3 px-4 text-emerald-400">${r.min_us.toFixed(2)} µs</td>
+              <td class="py-3 px-4 font-bold text-cyan-400">${r.avg_us.toFixed(2)} µs</td>
+              <td class="py-3 px-4 text-slate-300">${r.p95_us.toFixed(2)} µs</td>
+              <td class="py-3 px-4 text-slate-400">${r.max_us.toFixed(2)} µs</td>
+              <td class="py-3 px-4 text-slate-200">${r.throughput_msg_sec.toLocaleString()} msg/s</td>
+              <td class="py-3 px-4 text-amber-400 font-bold">${r.bandwidth_mb_sec.toFixed(1)} MB/s</td>
+            </tr>
+          `;
+        });
+      } catch (e) {
+        console.error('IPC benchmark fetch failed:', e);
+      }
+    }
+
     async function pollTelemetryData() {
       sequenceCounter++;
       try {
         const res = await fetch('/api/telemetry');
         const snap = await res.json();
         const sys = snap.system_metrics;
+
+        // Update Data Mode Banner
+        const modeBadge = document.getElementById('data-mode-badge');
+        const modeText = document.getElementById('data-mode-text');
+        if (snap.data_mode === 'REAL_QNX') {
+          modeBadge.className = "inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-950/80 border border-emerald-500/70 text-emerald-400 text-xs font-mono font-bold shadow-sm";
+          modeText.innerText = "REAL QNX MODE (" + snap.data_source + ")";
+        } else {
+          modeBadge.className = "inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-sky-950/80 border border-sky-500/70 text-sky-400 text-xs font-mono font-bold shadow-sm";
+          modeText.innerText = "DEMO MODE (Calibrated SDP 8.0 Model)";
+        }
 
         // Initialize persistent history on page load / refresh
         if (!isInitialized) {
@@ -730,7 +855,6 @@
             });
           }
         } else {
-          // Stream new sample in real-time
           if (snap.latency_history && snap.latency_history.length > 0) {
             const latest = snap.latency_history[snap.latency_history.length - 1];
             waterfallLabels.push(latest.time);
@@ -747,52 +871,53 @@
         }
         chartWaterfall.update();
 
-        // Update KPIs directly from server state
+        // Update KPIs
         document.getElementById('val-jitter').innerText = (sys.system_jitter_us || 0.95).toFixed(2);
         document.getElementById('val-misses').innerText = sys.total_deadline_misses || 0;
         document.getElementById('val-switches').innerText = (sys.context_switches || 210788).toLocaleString();
 
-        // Populate Table Rows from Server Task State
+        // Populate Task Matrix Table
         const tbody = document.getElementById('task-matrix-body');
-        tbody.innerHTML = '';
+        if (tbody) {
+          tbody.innerHTML = '';
+          const badgeClasses = {
+            "ASIL-D": "bg-red-500/15 text-red-400 border-red-500/40",
+            "ASIL-B": "bg-amber-500/15 text-amber-400 border-amber-500/40",
+            "Best-Effort": "bg-cyan-500/15 text-cyan-400 border-cyan-500/40"
+          };
+          const taskColors = {
+            "ASIL-D": "#ef4444",
+            "ASIL-B": "#f59e0b",
+            "Best-Effort": "#00f2fe"
+          };
 
-        const badgeClasses = {
-          "ASIL-D": "bg-red-500/15 text-red-400 border-red-500/40",
-          "ASIL-B": "bg-amber-500/15 text-amber-400 border-amber-500/40",
-          "Best-Effort": "bg-cyan-500/15 text-cyan-400 border-cyan-500/40"
-        };
-        const taskColors = {
-          "ASIL-D": "#ef4444",
-          "ASIL-B": "#f59e0b",
-          "Best-Effort": "#00f2fe"
-        };
-
-        snap.tasks.forEach(t => {
-          let color = taskColors[t.asil] || "#00f2fe";
-          let badgeCls = badgeClasses[t.asil] || "bg-cyan-500/15 text-cyan-400 border-cyan-500/40";
-          let periodFormatted = (t.target_period_us || 1000).toLocaleString() + " µs";
-          let utilization = (t.budget_utilization_pct || 1.2).toFixed(2);
-          
-          tbody.innerHTML += `
-            <tr class="hover:bg-slate-800/40 transition-colors">
-              <td class="py-3 px-4 font-sans font-semibold text-white">${t.name}</td>
-              <td class="py-3 px-4"><span class="px-2 py-0.5 rounded text-[10px] font-bold border ${badgeCls}">${t.asil}</span></td>
-              <td class="py-3 px-4 text-slate-300">${t.priority} (SCHED_FIFO)</td>
-              <td class="py-3 px-4 text-slate-300">${periodFormatted}</td>
-              <td class="py-3 px-4 font-bold" style="color: ${color};">${(t.current_latency_us || 12.2).toFixed(1)} µs</td>
-              <td class="py-3 px-4 text-slate-300">${(t.wcet_us || 17.8).toFixed(1)} µs</td>
-              <td class="py-3 px-4 text-slate-300">${(t.acet_us || 12.1).toFixed(1)} µs</td>
-              <td class="py-3 px-4">
-                <div class="text-[11px] text-slate-400 mb-1">${utilization}% used</div>
-                <div class="w-24 h-1.5 bg-slate-800 rounded-full overflow-hidden">
-                  <div class="h-full rounded-full" style="width: ${Math.min(utilization * 15, 100)}%; background: ${color};"></div>
-                </div>
-              </td>
-              <td class="py-3 px-4 font-bold text-emerald-400">${t.deadline_misses || 0}</td>
-              <td class="py-3 px-4"><span class="inline-flex items-center gap-1.5 text-emerald-400 font-semibold text-[11px]"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> ${t.status || 'CONFORMANT'}</span></td>
-            </tr>
-          `;
-        });
+          snap.tasks.forEach(t => {
+            let color = taskColors[t.asil] || "#00f2fe";
+            let badgeCls = badgeClasses[t.asil] || "bg-cyan-500/15 text-cyan-400 border-cyan-500/40";
+            let periodFormatted = (t.target_period_us || 1000).toLocaleString() + " µs";
+            let utilization = (t.budget_utilization_pct || 1.2).toFixed(2);
+            
+            tbody.innerHTML += `
+              <tr class="hover:bg-slate-800/40 transition-colors">
+                <td class="py-3 px-4 font-sans font-semibold text-white">${t.name}</td>
+                <td class="py-3 px-4"><span class="px-2 py-0.5 rounded text-[10px] font-bold border ${badgeCls}">${t.asil}</span></td>
+                <td class="py-3 px-4 text-slate-300">${t.priority} (SCHED_FIFO)</td>
+                <td class="py-3 px-4 text-slate-300">${periodFormatted}</td>
+                <td class="py-3 px-4 font-bold" style="color: ${color};">${(t.current_latency_us || 12.2).toFixed(1)} µs</td>
+                <td class="py-3 px-4 text-slate-300">${(t.wcet_us || 17.8).toFixed(1)} µs</td>
+                <td class="py-3 px-4 text-slate-300">${(t.acet_us || 12.1).toFixed(1)} µs</td>
+                <td class="py-3 px-4">
+                  <div class="text-[11px] text-slate-400 mb-1">${utilization}% used</div>
+                  <div class="w-24 h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                    <div class="h-full rounded-full" style="width: ${Math.min(utilization * 15, 100)}%; background: ${color};"></div>
+                  </div>
+                </td>
+                <td class="py-3 px-4 font-bold text-emerald-400">${t.deadline_misses || 0}</td>
+                <td class="py-3 px-4"><span class="inline-flex items-center gap-1.5 text-emerald-400 font-semibold text-[11px]"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> ${t.status || 'CONFORMANT'}</span></td>
+              </tr>
+            `;
+          });
+        }
 
       } catch (err) {
         console.warn('Telemetry poll error:', err);
@@ -804,6 +929,10 @@
 
     function downloadFormalAuditReport() {
       window.location.href = '/api/export_audit';
+    }
+
+    function downloadCsvReport() {
+      window.location.href = '/api/export_csv';
     }
   </script>
 </body>
