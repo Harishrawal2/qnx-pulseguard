@@ -531,11 +531,10 @@
     const ctxWaterfall = document.getElementById('chartLatencyWaterfall').getContext('2d');
     const ctxHistogram = document.getElementById('chartJitterHistogram').getContext('2d');
 
-    const waterfallLabels = ['16:32:14', '16:32:17', '16:32:20', '16:32:23', '16:32:26', '16:32:29', '16:32:32', '16:32:35', '16:32:38', '16:32:41'];
-    
-    const dsBrake = [12.2, 12.5, 12.1, 12.4, 12.3, 12.6, 12.2, 12.4, 12.3, 12.5];
-    const dsSteer = [24.0, 24.5, 23.8, 24.2, 24.1, 25.0, 24.2, 23.9, 24.4, 24.1];
-    const dsTele = [118.0, 114.0, 115.0, 128.0, 115.0, 125.0, 114.0, 130.0, 118.0, 124.0];
+    const waterfallLabels = [];
+    const dsBrake = [];
+    const dsSteer = [];
+    const dsTele = [];
 
     const chartWaterfall = new Chart(ctxWaterfall, {
       type: 'line',
@@ -665,6 +664,7 @@
 
     let stressActive = false;
     let sequenceCounter = 0;
+    let isInitialized = false;
 
     function appendConsoleLog(time, src, msg, type = 'info') {
       const box = document.getElementById('stream-console');
@@ -704,74 +704,100 @@
         const snap = await res.json();
         const sys = snap.system_metrics;
 
-        let latBrake = (12.2 + Math.random() * 0.5).toFixed(1);
-        let latSteer = (24.0 + Math.random() * 0.9).toFixed(1);
-        let latTele = (stressActive ? 285.0 + Math.random() * 60.0 : 115.0 + Math.random() * 20.0).toFixed(1);
-
-        let curJitter = stressActive ? (1.35 + Math.random() * 0.12).toFixed(2) : (sys.system_jitter_us || 0.95).toFixed(2);
-
-        document.getElementById('val-jitter').innerText = curJitter;
-        document.getElementById('val-misses').innerText = sys.total_deadline_misses || 0;
-        document.getElementById('val-switches').innerText = (210788 + sequenceCounter * 32).toLocaleString();
-
-        const tbody = document.getElementById('task-matrix-body');
-        tbody.innerHTML = '';
-
-        const taskDefs = [
-          { name: 'BrakeByWire_Actuator', grade: 'ASIL-D', badgeCls: 'bg-red-500/15 text-red-400 border-red-500/40', prio: '63 (SCHED_FIFO)', period: '1,000 µs', cur: latBrake, wcet: '17.8 µs', acet: '12.1 µs', color: '#ef4444', numPeriod: 1000 },
-          { name: 'SteeringAngle_Sensor', grade: 'ASIL-B', badgeCls: 'bg-amber-500/15 text-amber-400 border-amber-500/40', prio: '50 (SCHED_FIFO)', period: '5,000 µs', cur: latSteer, wcet: '38.5 µs', acet: '23.9 µs', color: '#f59e0b', numPeriod: 5000 },
-          { name: 'Vehicle_Telematics_GW', grade: 'Best-Effort', badgeCls: 'bg-cyan-500/15 text-cyan-400 border-cyan-500/40', prio: '15 (SCHED_FIFO)', period: '20,000 µs', cur: latTele, wcet: '312.0 µs', acet: '108.5 µs', color: '#00f2fe', numPeriod: 20000 }
-        ];
-
-        taskDefs.forEach(t => {
-          let pct = ((parseFloat(t.cur) / t.numPeriod) * 100).toFixed(2);
-          tbody.innerHTML += `
-            <tr class="hover:bg-slate-800/40 transition-colors">
-              <td class="py-3 px-4 font-sans font-semibold text-white">${t.name}</td>
-              <td class="py-3 px-4"><span class="px-2 py-0.5 rounded text-[10px] font-bold border ${t.badgeCls}">${t.grade}</span></td>
-              <td class="py-3 px-4 text-slate-300">${t.prio}</td>
-              <td class="py-3 px-4 text-slate-300">${t.period}</td>
-              <td class="py-3 px-4 font-bold" style="color: ${t.color};">${t.cur} µs</td>
-              <td class="py-3 px-4 text-slate-300">${t.wcet}</td>
-              <td class="py-3 px-4 text-slate-300">${t.acet}</td>
-              <td class="py-3 px-4">
-                <div class="text-[11px] text-slate-400 mb-1">${pct}% used</div>
-                <div class="w-24 h-1.5 bg-slate-800 rounded-full overflow-hidden">
-                  <div class="h-full rounded-full" style="width: ${Math.min(pct * 15, 100)}%; background: ${t.color};"></div>
-                </div>
-              </td>
-              <td class="py-3 px-4 font-bold text-emerald-400">0</td>
-              <td class="py-3 px-4"><span class="inline-flex items-center gap-1.5 text-emerald-400 font-semibold text-[11px]"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> CONFORMANT</span></td>
-            </tr>
-          `;
-        });
-
-        const timeNow = new Date().toTimeString().split(' ')[0];
-        waterfallLabels.push(timeNow);
-        dsBrake.push(parseFloat(latBrake));
-        dsSteer.push(parseFloat(latSteer));
-        dsTele.push(parseFloat(latTele));
-
-        if (waterfallLabels.length > 10) {
-          waterfallLabels.shift();
-          dsBrake.shift();
-          dsSteer.shift();
-          dsTele.shift();
+        // Initialize persistent history on page load / refresh
+        if (!isInitialized) {
+          isInitialized = true;
+          if (snap.latency_history && snap.latency_history.length > 0) {
+            waterfallLabels.length = 0;
+            dsBrake.length = 0;
+            dsSteer.length = 0;
+            dsTele.length = 0;
+            snap.latency_history.forEach(pt => {
+              waterfallLabels.push(pt.time);
+              dsBrake.push(pt.brake);
+              dsSteer.push(pt.steer);
+              dsTele.push(pt.tele);
+            });
+          }
+          if (snap.histogram_counts) {
+            chartHistogram.data.datasets[0].data = snap.histogram_counts;
+            chartHistogram.update();
+          }
+          if (snap.recent_events) {
+            document.getElementById('stream-console').innerHTML = '';
+            snap.recent_events.forEach(ev => {
+              appendConsoleLog(ev.time, ev.source, ev.msg, ev.level === 'WARN' ? 'warn' : 'ok');
+            });
+          }
+        } else {
+          // Stream new sample in real-time
+          if (snap.latency_history && snap.latency_history.length > 0) {
+            const latest = snap.latency_history[snap.latency_history.length - 1];
+            waterfallLabels.push(latest.time);
+            dsBrake.push(latest.brake);
+            dsSteer.push(latest.steer);
+            dsTele.push(latest.tele);
+            if (waterfallLabels.length > 14) {
+              waterfallLabels.shift();
+              dsBrake.shift();
+              dsSteer.shift();
+              dsTele.shift();
+            }
+          }
         }
         chartWaterfall.update();
 
-        if (sequenceCounter % 5 === 0) {
-          appendConsoleLog(timeNow, 'PULSE', `Pulse code 0x41 received on ChID 1 | Latency ${latBrake} µs | Jitter ${curJitter} µs`, 'ok');
-        }
+        // Update KPIs directly from server state
+        document.getElementById('val-jitter').innerText = (sys.system_jitter_us || 0.95).toFixed(2);
+        document.getElementById('val-misses').innerText = sys.total_deadline_misses || 0;
+        document.getElementById('val-switches').innerText = (sys.context_switches || 210788).toLocaleString();
+
+        // Populate Table Rows from Server Task State
+        const tbody = document.getElementById('task-matrix-body');
+        tbody.innerHTML = '';
+
+        const badgeClasses = {
+          "ASIL-D": "bg-red-500/15 text-red-400 border-red-500/40",
+          "ASIL-B": "bg-amber-500/15 text-amber-400 border-amber-500/40",
+          "Best-Effort": "bg-cyan-500/15 text-cyan-400 border-cyan-500/40"
+        };
+        const taskColors = {
+          "ASIL-D": "#ef4444",
+          "ASIL-B": "#f59e0b",
+          "Best-Effort": "#00f2fe"
+        };
+
+        snap.tasks.forEach(t => {
+          let color = taskColors[t.asil] || "#00f2fe";
+          let badgeCls = badgeClasses[t.asil] || "bg-cyan-500/15 text-cyan-400 border-cyan-500/40";
+          let periodFormatted = (t.target_period_us || 1000).toLocaleString() + " µs";
+          let utilization = (t.budget_utilization_pct || 1.2).toFixed(2);
+          
+          tbody.innerHTML += `
+            <tr class="hover:bg-slate-800/40 transition-colors">
+              <td class="py-3 px-4 font-sans font-semibold text-white">${t.name}</td>
+              <td class="py-3 px-4"><span class="px-2 py-0.5 rounded text-[10px] font-bold border ${badgeCls}">${t.asil}</span></td>
+              <td class="py-3 px-4 text-slate-300">${t.priority} (SCHED_FIFO)</td>
+              <td class="py-3 px-4 text-slate-300">${periodFormatted}</td>
+              <td class="py-3 px-4 font-bold" style="color: ${color};">${(t.current_latency_us || 12.2).toFixed(1)} µs</td>
+              <td class="py-3 px-4 text-slate-300">${(t.wcet_us || 17.8).toFixed(1)} µs</td>
+              <td class="py-3 px-4 text-slate-300">${(t.acet_us || 12.1).toFixed(1)} µs</td>
+              <td class="py-3 px-4">
+                <div class="text-[11px] text-slate-400 mb-1">${utilization}% used</div>
+                <div class="w-24 h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                  <div class="h-full rounded-full" style="width: ${Math.min(utilization * 15, 100)}%; background: ${color};"></div>
+                </div>
+              </td>
+              <td class="py-3 px-4 font-bold text-emerald-400">${t.deadline_misses || 0}</td>
+              <td class="py-3 px-4"><span class="inline-flex items-center gap-1.5 text-emerald-400 font-semibold text-[11px]"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> ${t.status || 'CONFORMANT'}</span></td>
+            </tr>
+          `;
+        });
 
       } catch (err) {
         console.warn('Telemetry poll error:', err);
       }
     }
-
-    appendConsoleLog('12:00:00', 'PROCNTO', 'QNX Neutrino 8.0 instrumented kernel active (procnto-smp-instr)', 'ok');
-    appendConsoleLog('12:00:01', 'IPC', 'Channel created with ChannelCreate(0), side-channel bound', 'ok');
-    appendConsoleLog('12:00:01', 'SCHED', 'Thread priorities set with pthread_setschedparam(SCHED_FIFO)', 'ok');
 
     setInterval(pollTelemetryData, 1000);
     pollTelemetryData();
