@@ -4,7 +4,7 @@
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![Target](https://img.shields.io/badge/Target-QNX_SDP_8.0-red.svg)](https://blackberry.qnx.com)
 [![Category](https://img.shields.io/badge/Category-Developer_Tooling_%26_Host_Tools-green.svg)]()
-[![Status](https://img.shields.io/badge/Tests-9%2F9_Passing-brightgreen.svg)](docs/TEST_RESULTS.md)
+[![Status](https://img.shields.io/badge/Tests-16%2F16_Passing-brightgreen.svg)](docs/TEST_RESULTS.md)
 
 ---
 
@@ -32,7 +32,7 @@ PulseGuard pairs an ultra-low-overhead native QNX C telemetry agent with an ente
 - **CPU Contention Stress Testing:** Dynamic injection of controlled CPU contention to empirically verify `SCHED_FIFO` priority preemption.
 - **Enterprise Dark-Mode Dashboard:** Developed with Tailwind CSS, Chart.js, and Lucide vector icons, featuring persistent circular buffer history that survives page reloads.
 - **Dual Operating Modes:** Transparently switches between **REAL QNX MODE** (live target UDP frames) and **DEMO MODE** (synthetic datasets for workstation testing).
-- **Audit & Evidence Export:** Instant JSON and CSV export of statistical timing evidence, worst-case execution time (WCET), and percentile distributions ($P_{50}, P_{95}, P_{99}, P_{99.9}$).
+- **Audit & Evidence Export:** Instant JSON and CSV export of statistical timing evidence, maximum observed execution time (high-water mark), and percentile distributions ($P_{50}, P_{95}, P_{99}, P_{99.9}$).
 
 ---
 

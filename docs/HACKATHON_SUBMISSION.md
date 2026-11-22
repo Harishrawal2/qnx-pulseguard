@@ -37,5 +37,16 @@ PulseGuard directly integrates key QNX Neutrino RTOS capabilities:
 
 ---
 
-## 6. Verification & Transparency
-The repository includes automated test suites covering statistical algorithms, circular buffer history persistence, and REST endpoints. All target-specific limitations and host requirements are documented transparently in `docs/PROJECT_AUDIT.md` and `docs/TEST_RESULTS.md`.
+## 6. Verification Status & Transparent Engineering Claims
+- **Host Tooling & Analysis Engine:** 100% verified. 16/16 unit and integration tests passing covering percentile mathematics, circular history buffer, UDP schema validation, and REST APIs.
+- **Target Microkernel Primitives:** Native C source code implements genuine QNX 8.0 APIs (`ClockCycles()`, `SYSPAGE_ENTRY(qtime)`, `ChannelCreate()`, `MsgSend/MsgReceive/MsgReply`, `SCHED_FIFO`).
+- **Target Runtime Execution:** Transparently marked as pending execution on a target machine with an active QNX SDP 8.0 license. Simulated demo datasets are strictly labeled as such to prevent confusing synthetic benchmarks with actual hardware execution logs.
+- **Video Submission Requirement:** Video demonstration must be published as a **Public YouTube video under 3:00 minutes** (script provided in `docs/DEMO_SCRIPT.md`).
+
+---
+
+## 7. Submission Checklist Before Devpost Finalization
+- [ ] Public YouTube video link (under 3 minutes) uploaded and added to Devpost.
+- [ ] GitHub repository public: https://github.com/Harishrawal2/qnx-pulseguard
+- [ ] Performance claims explicitly qualified as reference model evidence without claiming formal ISO 26262 certification.
+- [ ] Native compilation steps documented in `docs/QNX_BUILD.md` for judges reviewing code reproducibility.

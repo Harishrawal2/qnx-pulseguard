@@ -1,6 +1,11 @@
-# QNX PulseGuard — Video Demonstration Script (3-Minute Walkthrough)
+# QNX PulseGuard — Video Demonstration Script (Under 3 Minutes)
 
-**Video Target Duration:** 2 minutes 45 seconds  
+> [!IMPORTANT]
+> **Official Hackathon Submission Rule:**  
+> The video demonstration **must be uploaded to YouTube with Public visibility** and must be **strictly under 3:00 minutes** in total length. Unlisted/private YouTube links, Vimeo, or external video players do not qualify under official submission criteria.
+
+**Video Target Duration:** 2 minutes 40 seconds  
+**Platform:** Public YouTube Video  
 **Target Audience:** BlackBerry QNX Hackathon Evaluators, Embedded Systems Architects  
 
 ---
