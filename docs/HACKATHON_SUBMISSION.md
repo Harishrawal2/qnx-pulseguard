@@ -63,6 +63,9 @@ QNX PulseGuard — Real-Time Latency & Timing Analysis Tool for QNX SDP 8.0
 ### Elevator Pitch:
 A native real-time latency profiler and timing verification suite for QNX SDP 8.0, combining high-resolution microkernel cycle counters and synchronous IPC benchmarking with an enterprise host dashboard for automotive software development.
 
+### Technical Disclaimer & Verification Scope:
+> *This demonstration uses reference automotive workloads to analyze timing behavior. Our native IPC benchmark runs on QNX Neutrino 8.0 inside VirtualBox and measures synchronous message-passing latency. The dashboard also supports simulated CPU contention for exploring timing scenarios. These results are development benchmarks, not certified automotive safety guarantees.*
+
 ### Inspiration:
 In autonomous driving and automotive safety architectures (such as brake-by-wire and steer-by-wire), meeting deterministic execution deadlines is a fundamental safety requirement. Generic profiling tools often introduce significant overhead or treat the operating system as a black box. We built QNX PulseGuard to leverage the unique microkernel architecture of BlackBerry QNX Neutrino RTOS 8.0, giving developers microsecond-level timing visibility without compromising real-time determinism.
 

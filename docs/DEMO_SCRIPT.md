@@ -78,4 +78,12 @@
 1. **Timer Check:** Use a phone stopwatch while recording to ensure the final edit finishes between **2:40 and 2:50**. Do NOT exceed 2:59.
 2. **Resolution:** Record at 1080p (1920x1080) at 30 or 60 fps.
 3. **Visibility:** When publishing on YouTube, set Visibility to **Public** (not Unlisted, not Private).
-4. **Description:** Include the GitHub link in the video description: `https://github.com/Harishrawal2/qnx-pulseguard`.
+4. **Description:** Include the GitHub link and the official engineering scope disclaimer in the video description:
+   ```text
+   QNX PulseGuard — Real-Time Deterministic Latency & Timing Analysis Tool for QNX SDP 8.0
+   BlackBerry QNX Global Hackathon 2026 Submission (Developer Tooling & Host Tools Track)
+
+   GitHub Repository: https://github.com/Harishrawal2/qnx-pulseguard
+
+   Disclaimer: This demonstration uses reference automotive workloads to analyze timing behavior. Our native IPC benchmark runs on QNX Neutrino 8.0 inside VirtualBox and measures synchronous message-passing latency. The dashboard also supports simulated CPU contention for exploring timing scenarios. These results are development benchmarks, not certified automotive safety guarantees.
+   ```
