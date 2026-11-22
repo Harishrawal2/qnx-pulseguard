@@ -39,9 +39,9 @@ HEADER_SIZE = struct.calcsize(HEADER_FORMAT)
 TASK_FORMAT = "<32sIiIQQQQQQd?"
 TASK_SIZE = struct.calcsize(TASK_FORMAT)
 
-# Configurable telemetry sender restriction
+# Configurable telemetry sender restriction (permits loopback and VirtualBox host-only subnet)
 ALLOWED_TELEMETRY_SUBNETS = os.environ.get(
-    "PULSEGUARD_ALLOWED_IPS", "127.0.0.1,::1,localhost"
+    "PULSEGUARD_ALLOWED_IPS", "127.0.0.1,::1,localhost,192.168.56."
 ).split(",")
 
 class TelemetryState:
@@ -160,10 +160,12 @@ class TelemetryState:
         self.event_log.append({"time": now, "level": "INFO", "source": "MONITOR", "msg": "Reference workload timing monitoring initialized for 'BrakeByWire_Actuator'"})
 
     def is_sender_allowed(self, sender_ip):
-        """Validates that incoming telemetry comes from an authorized host."""
+        """Validates that incoming telemetry comes from an authorized host or subnet."""
         for allowed in ALLOWED_TELEMETRY_SUBNETS:
             allowed = allowed.strip()
             if allowed in (sender_ip, "0.0.0.0", "*"):
+                return True
+            if allowed.endswith(".") and sender_ip.startswith(allowed):
                 return True
         return False
 
