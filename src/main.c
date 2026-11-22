@@ -86,14 +86,26 @@ int main(int argc, char *argv[]) {
     printf("    Targeting: QNX Neutrino RTOS 8.0 & Autonomous Systems        \n");
     printf("=================================================================\n\n");
 
+    const char *target_host = "192.168.56.1";
     int port = DEFAULT_TELEMETRY_PORT;
     if (argc > 1) {
-        port = atoi(argv[1]);
+        if (strchr(argv[1], '.')) {
+            target_host = argv[1];
+            if (argc > 2) port = atoi(argv[2]);
+        } else {
+            port = atoi(argv[1]);
+            if (argc > 2) target_host = argv[2];
+        }
     }
 
     if (pulseguard_init(port, true) != 0) {
         fprintf(stderr, "Failed to initialize PulseGuard daemon\n");
         return 1;
+    }
+
+    if (target_host && strlen(target_host) > 0) {
+        pulseguard_set_target(target_host, port);
+        printf("[PulseGuard] Telemetry broadcast destination: %s:%d\n", target_host, port);
     }
 
     /* Register automotive-grade real-time tasks */

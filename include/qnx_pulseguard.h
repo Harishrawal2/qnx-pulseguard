@@ -41,11 +41,12 @@ typedef enum {
     CRITICALITY_HARD_RT     = 3  /* Zero-tolerance hard deadline */
 } CriticalityLevel;
 
-/* Task state snapshot */
+#pragma pack(push, 1)
+/* Task state snapshot (packed to match wire format without compiler padding) */
 typedef struct {
     char task_name[MAX_TASK_NAME_LEN];
     uint32_t task_id;
-    CriticalityLevel level;
+    int32_t level;
     uint32_t priority;             /* QNX RTOS priority (1-255, typically 63 for hard RT) */
     uint64_t target_period_ns;     /* Expected loop period in nanoseconds */
     uint64_t worst_latency_ns;     /* Worst observed jitter/latency */
@@ -57,7 +58,7 @@ typedef struct {
     bool is_healthy;               /* True if within safety threshold */
 } TaskTelemetry;
 
-/* Global system telemetry frame sent to host dashboard */
+/* Global system telemetry frame sent to host dashboard (packed for UDP wire transit) */
 typedef struct {
     char magic[4];                 /* "QPUL" */
     uint32_t sequence_num;
@@ -69,9 +70,11 @@ typedef struct {
     bool failsafe_triggered;       /* True if ASIL-D task breached critical threshold */
     TaskTelemetry tasks[MAX_REGISTERED_TASKS];
 } PulseGuardFrame;
+#pragma pack(pop)
 
 /* API functions */
 int pulseguard_init(int telemetry_port, bool verbose);
+int pulseguard_set_target(const char *target_ip, int port);
 int pulseguard_register_task(const char *name, CriticalityLevel level, int priority, uint64_t period_ns);
 void pulseguard_record_execution(int task_id, uint64_t execution_latency_ns, bool missed_deadline);
 int pulseguard_emit_telemetry(const PulseGuardFrame *frame);

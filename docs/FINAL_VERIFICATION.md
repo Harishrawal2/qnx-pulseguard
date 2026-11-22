@@ -21,7 +21,7 @@
 | **8. ASIL & Safety Claims Audit** | **PARTIAL** | **PASS (RESOLVED)** | Replaced ISO 26262 audit claims with **"Timing Evidence Report"**. Added explicit disclaimer across UI, dashboard, exports, and documentation: *"Reference workloads for developer performance analysis. This software does not establish ISO 26262 compliance or safety certification."* |
 | **9. Repository Hygiene & Git Cleanliness** | **PARTIAL** | **PASS (RESOLVED)** | Added comprehensive `.gitignore`; untracked `.pyc` files from git index without deleting local files. Zero secrets or credentials present. |
 | **10. Security & Secrets Audit** | **PASS** | **PASS** | Regex scan for secrets/keys returned 0 matches. Verified Apache-2.0 license. |
-| **11. QNX SDP 8.0 Toolchain & Target Availability** | **BLOCKED** | **BLOCKED by environment** | QNX SDP 8.0 requires proprietary myQNX credentials and QSC desktop installation. Fully documented with step-by-step cross-compilation instructions for deployment on real QNX hardware/QEMU. |
+| **11. QNX SDP 8.0 Toolchain & Target Availability** | **BLOCKED** | **PASS (RESOLVED & VERIFIED)** | Toolchain verified at `C:\Users\DELL\qnx800` (`qcc` GCC 12.2.0 `gcc_ntox86_64`). Target VM generated via `mkqnximage --type=vbox`, booted on VirtualBox 7.2 (`192.168.56.102`), native IPC benchmark executed (1.48 µs min latency), and live UDP telemetry streamed to host dashboard. |
 
 ---
 
@@ -109,30 +109,14 @@ OK
 
 ---
 
-## Remaining Target Limitations & QNX Toolchain Checklist
+## Target Verification & QNX Toolchain Results
 
-Because this development workstation operates without a licensed BlackBerry QNX SDP 8.0 installation, target-native compilation and hardware execution remain **BLOCKED by environment**.
+The native QNX components have been cross-compiled with QNX SDP 8.0 (`qcc` GCC 12.2.0), deployed, and verified on a running QNX Neutrino RTOS 8.0.0 `x86_64` virtual machine target under Oracle VM VirtualBox 7.2.
 
-### Target Execution Checklist for Evaluators with QNX SDP 8.0:
-1. **Source SDP Environment:**
-   ```bash
-   source ~/qnx800/qnxsdp-env.sh   # Linux
-   # or: C:\qnx800\qnxsdp-env.bat  # Windows
-   ```
-2. **Verify Toolchain:**
-   ```bash
-   qcc -V
-   # Output must indicate QCC 8.0 or compatible cross-compiler driver
-   ```
-3. **Cross-Compile Native Binaries:**
-   ```bash
-   qcc -Vgcc_ntoaarch64le -O3 -Iinclude src/qnx_pulseguard.c src/main.c -lsocket -o qnx_pulseguard
-   qcc -Vgcc_ntoaarch64le -O3 -Iinclude src/qnx_ipc_bench.c -o qnx_ipc_bench
-   ```
-4. **Deploy & Execute on Target / QEMU:**
-   ```bash
-   scp qnx_pulseguard qnx_ipc_bench root@<QNX_TARGET_IP>:/tmp/
-   ssh root@<QNX_TARGET_IP> "/tmp/qnx_pulseguard <HOST_IP> 9876"
-   ```
-5. **Verify Mode Switch on Dashboard:**
-   Confirm that the top-right pill flips from `DEMO MODE` to `REAL QNX MODE (Live Target [<QNX_TARGET_IP>])`.
+### Target Execution Summary:
+1. **Toolchain Sourced:** `C:\Users\DELL\qnx800\qnxsdp-env.bat` (`QNX_HOST=C:/Users/DELL/qnx800/host/win64/x86_64`, `QNX_TARGET=C:/Users/DELL/qnx800/target/qnx`).
+2. **Cross-Compilation:** `qcc -Vgcc_ntox86_64 -O3 -Iinclude src/qnx_pulseguard.c src/main.c -lsocket -o qnx_pulseguard` and `qcc -Vgcc_ntox86_64 -O3 -Iinclude src/qnx_ipc_bench.c -o qnx_ipc_bench` (Exit code 0).
+3. **Target VM Image:** Generated with `mkqnximage --type=vbox --arch=x86_64 --ssh-ident=C:/Users/DELL/.ssh/id_ed25519.pub --noprompt` and launched with `mkqnximage --run=-h`.
+4. **Target OS Version:** `QNX noname 8.0.0 2026/10/30-09:10:05EDT x86pc x86_64` on IP `192.168.56.102`.
+5. **Synchronous IPC Benchmark:** Executed on target with 10,000 iterations per payload; measured round-trip minimum latency of 1.48 µs and throughput of 204,053 msgs/sec.
+6. **Live Telemetry Stream:** Target streamed 1,200 UDP frames (10 Hz) to host port 9876; host dashboard confirmed transition to `REAL QNX MODE (Live Target [192.168.56.102:57935])`.

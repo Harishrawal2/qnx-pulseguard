@@ -80,7 +80,12 @@ int pulseguard_init(int telemetry_port, bool verbose) {
     memset(&g_broadcast_addr, 0, sizeof(g_broadcast_addr));
     g_broadcast_addr.sin_family = AF_INET;
     g_broadcast_addr.sin_port = htons(telemetry_port);
-    g_broadcast_addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK); /* Send to localhost or subnet */
+    const char *env_host = getenv("PULSEGUARD_HOST");
+    if (env_host && strlen(env_host) > 0) {
+        g_broadcast_addr.sin_addr.s_addr = inet_addr(env_host);
+    } else {
+        g_broadcast_addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK); /* Send to localhost or subnet */
+    }
 
 #if QNX_NATIVE
     /* Create QNX Neutrino Synchronous IPC Channel */
@@ -170,11 +175,43 @@ void pulseguard_record_execution(int task_id, uint64_t execution_latency_ns, boo
     pthread_mutex_unlock(&g_state_mutex);
 }
 
+int pulseguard_set_target(const char *target_ip, int port) {
+    if (target_ip && strlen(target_ip) > 0) {
+        g_broadcast_addr.sin_addr.s_addr = inet_addr(target_ip);
+    }
+    if (port > 0) {
+        g_broadcast_addr.sin_port = htons(port);
+    }
+    return 0;
+}
+
 int pulseguard_emit_telemetry(const PulseGuardFrame *frame) {
     if (g_telemetry_socket < 0) return -1;
-    ssize_t sent = sendto(g_telemetry_socket, (const char*)frame, sizeof(PulseGuardFrame), 0,
+    PulseGuardFrame local_frame;
+    pthread_mutex_lock(&g_state_mutex);
+    if (frame == NULL) {
+        local_frame = g_current_frame;
+        local_frame.sequence_num++;
+        local_frame.timestamp_ns = pulseguard_get_time_ns();
+        g_current_frame.sequence_num = local_frame.sequence_num;
+    } else {
+        local_frame = *frame;
+        for (uint32_t i = 0; i < g_current_frame.active_tasks_count; ++i) {
+            local_frame.tasks[i] = g_current_frame.tasks[i];
+        }
+        local_frame.active_tasks_count = g_current_frame.active_tasks_count;
+        local_frame.total_deadline_misses = g_current_frame.total_deadline_misses;
+        local_frame.failsafe_triggered = g_current_frame.failsafe_triggered;
+    }
+    pthread_mutex_unlock(&g_state_mutex);
+
+    size_t header_wire_size = 41; // 4 + 4 + 8 + 4 + 4 + 8 + 8 + 1
+    size_t task_wire_size = 101;  // 32 + 4 + 4 + 4 + 8 + 8 + 8 + 8 + 8 + 8 + 8 + 1
+    size_t send_size = header_wire_size + (local_frame.active_tasks_count * task_wire_size);
+
+    ssize_t sent = sendto(g_telemetry_socket, (const char*)&local_frame, send_size, 0,
                           (struct sockaddr*)&g_broadcast_addr, sizeof(g_broadcast_addr));
-    return (sent == sizeof(PulseGuardFrame)) ? 0 : -1;
+    return (sent == (ssize_t)send_size) ? 0 : -1;
 }
 
 void pulseguard_shutdown(void) {

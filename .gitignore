@@ -36,3 +36,5 @@ htmlcov/
 .qnx/
 *.bsp
 *.ifs
+*.vmdk
+qnx_vbox_vm/

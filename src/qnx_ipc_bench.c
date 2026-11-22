@@ -95,7 +95,7 @@ static double bench_cycles_to_us(uint64_t cycles) {
 #if QNX_NATIVE
     static uint64_t cps = 0;
     if (cps == 0) {
-        qtime_entry_t *qtime = SYSPAGE_ENTRY(qtime);
+        struct qtime_entry *qtime = SYSPAGE_ENTRY(qtime);
         if (qtime && qtime->cycles_per_sec > 0) {
             cps = qtime->cycles_per_sec;
         } else {
