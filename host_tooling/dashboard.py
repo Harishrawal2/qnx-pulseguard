@@ -13,7 +13,7 @@ Key Capabilities:
 
 Security Notice:
 - Packet framing magic bytes (b"QPUL") identify wire format only and do NOT authenticate the sender.
-- Network security in production QNX deployments relies on IP-level isolation, IPSec, or authenticated transport.
+- UDP IP allowlisting restricts the network attack surface but is NOT cryptographic authentication (IP headers can be spoofed on unauthenticated local networks). Production automotive and medical QNX deployments must enforce MACsec, IPsec, or DTLS encryption.
 """
 
 import sys

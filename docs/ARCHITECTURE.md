@@ -106,6 +106,10 @@ typedef struct {
 } PulseGuardFrame;
 ```
 
+> [!IMPORTANT]
+> **Transport Security & Authentication Notice:**  
+> Magic bytes (`b"QPUL"`) serve as protocol framing tokens to filter noise, and UDP IP allowlisting restricts network exposure. However, IP allowlisting is **not cryptographic authentication** (IPv4 addresses can be spoofed on unauthenticated local networks). Production vehicle deployments must run over MACsec, IPsec, or DTLS tunnels.
+
 ### Task Record (`TaskTelemetry`, 101 bytes)
 ```c
 typedef struct {

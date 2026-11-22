@@ -241,6 +241,12 @@ int run_ipc_benchmark(uint32_t payload_size, uint32_t iterations, IpcBenchmarkRe
     if (g_server_state != SERVER_STATE_READY) {
         fprintf(stderr, "[IPC Bench Client] Server initialization failed or timed out\n");
         g_server_state = SERVER_STATE_STOPPING;
+#if QNX_NATIVE
+        if (g_bench_chid >= 0) {
+            ChannelDestroy(g_bench_chid);
+            g_bench_chid = -1;
+        }
+#endif
         pthread_mutex_unlock(&g_server_lock);
         pthread_join(srv_thread, NULL);
         free(samples);
