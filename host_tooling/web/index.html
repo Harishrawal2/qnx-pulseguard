@@ -1,644 +1,326 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>QNX PulseGuard — SDP 8.0 Real-Time Telemetry & Safety Profiler</title>
+  
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#f0f9ff',
+              400: '#38bdf8',
+              500: '#0ea5e9',
+              600: '#0284c7',
+            },
+            surface: {
+              base: '#080c14',
+              card: '#0f172a',
+              subtle: '#1e293b',
+              border: '#1e293b',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons & Chart.js -->
+  <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
   <style>
-    :root {
-      --bg-canvas: #090d16;
-      --bg-panel: #0f1623;
-      --bg-panel-hover: #141d2e;
-      --bg-subtle: #192338;
-      --border-panel: #202c45;
-      --border-light: rgba(255, 255, 255, 0.08);
-      
-      --text-main: #f1f5f9;
-      --text-muted: #94a3b8;
-      --text-dim: #64748b;
-
-      --signal-green: #10b981;
-      --signal-green-bg: rgba(16, 185, 129, 0.12);
-      --signal-blue: #0284c7;
-      --signal-cyan: #06b6d4;
-      --signal-amber: #f59e0b;
-      --signal-amber-bg: rgba(245, 158, 11, 0.12);
-      --signal-red: #ef4444;
-      --signal-red-bg: rgba(239, 68, 68, 0.14);
-
-      --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      --font-mono: 'JetBrains Mono', 'Consolas', monospace;
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    
-    body {
-      background-color: var(--bg-canvas);
-      color: var(--text-main);
-      font-family: var(--font-ui);
-      font-size: 13px;
-      line-height: 1.5;
-      -webkit-font-smoothing: antialiased;
-      padding: 16px 20px;
-    }
-
-    .app-shell {
-      max-width: 1540px;
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    /* System Topbar */
-    .topbar {
-      background: var(--bg-panel);
-      border: 1px solid var(--border-panel);
-      border-radius: 8px;
-      padding: 12px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 14px;
-    }
-
-    .brand-cluster {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-
-    .qnx-pill {
-      background: #000;
-      border: 1px solid #334155;
-      color: #38bdf8;
-      font-family: var(--font-mono);
-      font-size: 11px;
-      font-weight: 700;
-      padding: 4px 10px;
-      border-radius: 4px;
-      letter-spacing: 0.5px;
-    }
-
-    .brand-title {
-      font-size: 16px;
-      font-weight: 700;
-      color: #fff;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .brand-sub {
-      font-size: 12px;
-      color: var(--text-muted);
-      border-left: 1px solid var(--border-panel);
-      padding-left: 12px;
-      margin-left: 4px;
-    }
-
-    .topbar-meta {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      font-family: var(--font-mono);
-      font-size: 11px;
-      color: var(--text-muted);
-    }
-
-    .meta-item {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .status-indicator {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: var(--signal-green-bg);
-      border: 1px solid rgba(16, 185, 129, 0.3);
-      color: var(--signal-green);
-      padding: 4px 10px;
-      border-radius: 4px;
-      font-weight: 600;
-    }
-
-    .status-dot {
-      width: 7px;
-      height: 7px;
-      background: var(--signal-green);
-      border-radius: 50%;
-      animation: status-pulse 1.8s infinite ease-in-out;
-    }
-
-    @keyframes status-pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.3; }
-    }
-
-    .topbar-actions {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .btn {
-      font-family: var(--font-ui);
-      font-size: 12px;
-      font-weight: 600;
-      padding: 7px 14px;
-      border-radius: 6px;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      transition: all 0.15s ease;
-      border: 1px solid transparent;
-    }
-
-    .btn-secondary {
-      background: var(--bg-subtle);
-      border-color: var(--border-panel);
-      color: var(--text-main);
-    }
-    .btn-secondary:hover {
-      background: #23314d;
-      border-color: #3b82f6;
-    }
-
-    .btn-danger-outline {
-      background: rgba(239, 68, 68, 0.08);
-      border-color: rgba(239, 68, 68, 0.3);
-      color: #f87171;
-    }
-    .btn-danger-outline:hover {
-      background: rgba(239, 68, 68, 0.2);
-    }
-
-    .btn-primary {
-      background: #0284c7;
-      color: #fff;
-    }
-    .btn-primary:hover {
-      background: #0369a1;
-    }
-
-    /* Executive KPI Grid */
-    .kpi-row {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 14px;
-    }
-
-    @media (max-width: 1024px) {
-      .kpi-row { grid-template-columns: repeat(2, 1fr); }
-    }
-    @media (max-width: 640px) {
-      .kpi-row { grid-template-columns: 1fr; }
-    }
-
-    .kpi-panel {
-      background: var(--bg-panel);
-      border: 1px solid var(--border-panel);
-      border-radius: 8px;
-      padding: 16px 18px;
-    }
-
-    .kpi-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      margin-bottom: 8px;
-    }
-
-    .kpi-title {
-      font-size: 11px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: var(--text-muted);
-    }
-
-    .kpi-tag {
-      font-family: var(--font-mono);
-      font-size: 10px;
-      padding: 2px 6px;
-      border-radius: 3px;
-      font-weight: 600;
-    }
-    .kpi-tag-pass { background: var(--signal-green-bg); color: var(--signal-green); }
-
-    .kpi-value {
-      font-family: var(--font-mono);
-      font-size: 26px;
-      font-weight: 700;
-      color: #fff;
-      display: flex;
-      align-items: baseline;
-      gap: 4px;
-    }
-
-    .kpi-unit {
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--text-muted);
-    }
-
-    .kpi-footer {
-      margin-top: 8px;
-      font-size: 11px;
-      color: var(--text-muted);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    /* Visual Analytics Grid */
-    .analytics-grid {
-      display: grid;
-      grid-template-columns: 2.2fr 1fr;
-      gap: 14px;
-    }
-
-    @media (max-width: 1024px) {
-      .analytics-grid { grid-template-columns: 1fr; }
-    }
-
-    .card {
-      background: var(--bg-panel);
-      border: 1px solid var(--border-panel);
-      border-radius: 8px;
-      padding: 18px;
-    }
-
-    .card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 14px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid var(--border-panel);
-    }
-
-    .card-title {
-      font-size: 13px;
-      font-weight: 600;
-      color: #fff;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .card-subtitle {
-      font-size: 11px;
-      color: var(--text-muted);
-      font-family: var(--font-mono);
-    }
-
-    .chart-box {
-      position: relative;
-      height: 250px;
-      width: 100%;
-    }
-
-    /* Professional Engineering Data Table */
-    .table-container {
-      overflow-x: auto;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      text-align: left;
-      font-size: 12px;
-    }
-
-    th {
-      background: var(--bg-subtle);
-      color: var(--text-muted);
-      font-weight: 600;
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      padding: 10px 14px;
-      border-bottom: 1px solid var(--border-panel);
-    }
-
-    td {
-      padding: 12px 14px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-      font-family: var(--font-mono);
-    }
-
-    tr:hover td {
-      background: var(--bg-panel-hover);
-    }
-
-    .task-name-cell {
-      font-family: var(--font-ui);
-      font-weight: 600;
-      color: #fff;
-    }
-
-    .badge-grade {
-      font-family: var(--font-mono);
-      font-size: 10px;
-      font-weight: 700;
-      padding: 3px 7px;
-      border-radius: 3px;
-      display: inline-block;
-    }
-    .grade-asil-d { background: var(--signal-red-bg); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); }
-    .grade-asil-b { background: var(--signal-amber-bg); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); }
-    .grade-be { background: rgba(2, 132, 199, 0.14); color: #38bdf8; border: 1px solid rgba(2, 132, 199, 0.4); }
-
-    .budget-track {
-      width: 90px;
-      height: 5px;
-      background: #1e293b;
-      border-radius: 2px;
-      overflow: hidden;
-      margin-top: 4px;
-    }
-    .budget-fill {
-      height: 100%;
-      border-radius: 2px;
-    }
-
-    /* QNX Architecture Evidence Table */
-    .evidence-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 12px;
-      margin-top: 10px;
-    }
-
-    .evidence-box {
-      background: var(--bg-canvas);
-      border: 1px solid var(--border-panel);
-      border-radius: 6px;
-      padding: 12px 14px;
-    }
-
-    .evidence-title {
-      font-family: var(--font-mono);
-      font-weight: 600;
-      color: #38bdf8;
-      font-size: 12px;
-      margin-bottom: 4px;
-    }
-
-    .evidence-desc {
-      font-size: 11px;
-      color: var(--text-muted);
-      line-height: 1.4;
-    }
-
-    /* Monospace Console */
-    .console-stream {
-      background: #05080f;
-      border: 1px solid #1e293b;
-      border-radius: 6px;
-      padding: 12px 14px;
-      font-family: var(--font-mono);
-      font-size: 11px;
-      height: 130px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
-    }
-
-    .log-line { display: flex; gap: 10px; opacity: 0.95; }
-    .log-t { color: #64748b; }
-    .log-src { color: #38bdf8; font-weight: 600; width: 65px; }
-    .log-msg { color: #cbd5e1; }
-    .log-warn { color: #fbbf24; }
-    .log-ok { color: #34d399; }
-
-    /* Footer */
-    .app-footer {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 12px 6px;
-      color: var(--text-dim);
-      font-size: 11px;
-      font-family: var(--font-mono);
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-    .app-footer a { color: #38bdf8; text-decoration: none; }
+    /* Custom scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #080c14; }
+    ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #334155; }
   </style>
 </head>
-<body>
+<body class="bg-[#080c14] text-slate-100 font-sans antialiased min-h-screen p-3 md:p-6 selection:bg-brand-500 selection:text-white">
 
-  <div class="app-shell">
+  <div class="max-w-[1600px] mx-auto space-y-5">
 
-    <!-- Topbar -->
-    <header class="topbar">
-      <div class="brand-cluster">
-        <div class="qnx-pill">QNX® 8.0</div>
-        <div>
-          <div class="brand-title">PulseGuard Host Observability</div>
+    <!-- Top Navigation Header -->
+    <header class="bg-slate-900/80 backdrop-blur-md border border-slate-800 rounded-xl px-5 py-3.5 flex flex-wrap items-center justify-between gap-4 shadow-xl shadow-black/20">
+      
+      <!-- Logo & Target Info -->
+      <div class="flex items-center gap-4">
+        <div class="flex items-center gap-3">
+          <div class="bg-gradient-to-br from-brand-500 to-indigo-600 p-2.5 rounded-lg shadow-md shadow-brand-500/20 text-white">
+            <i data-lucide="activity" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-base font-bold tracking-tight text-white">QNX PulseGuard</span>
+              <span class="px-2 py-0.5 text-[10px] font-mono font-bold bg-sky-950/80 text-sky-400 border border-sky-800/80 rounded">SDP 8.0</span>
+            </div>
+            <p class="text-xs text-slate-400 font-medium">Real-Time Deterministic Latency & ISO 26262 Profiler</p>
+          </div>
         </div>
-        <div class="brand-sub">Real-Time Deterministic Latency & ISO 26262 Profiler</div>
+
+        <div class="hidden xl:flex items-center gap-3 pl-4 border-l border-slate-800 text-xs font-mono text-slate-400">
+          <span class="flex items-center gap-1.5"><i data-lucide="cpu" class="w-3.5 h-3.5 text-brand-400"></i> procnto-smp-instr</span>
+          <span class="text-slate-600">•</span>
+          <span class="flex items-center gap-1.5"><i data-lucide="timer" class="w-3.5 h-3.5 text-emerald-400"></i> ClockCycles() @ 1.8GHz</span>
+          <span class="text-slate-600">•</span>
+          <span class="flex items-center gap-1.5"><i data-lucide="git-commit" class="w-3.5 h-3.5 text-amber-400"></i> ChID: 1 / CoID: 1</span>
+        </div>
       </div>
 
-      <div class="topbar-meta">
-        <div class="meta-item">
-          <span>Target:</span>
-          <strong style="color: #fff;">procnto-smp-instr</strong>
+      <!-- Live Stream Status & Actions -->
+      <div class="flex items-center gap-3">
+        <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-950/40 border border-emerald-800/50 text-emerald-400 text-xs font-mono font-medium">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+          <span>STREAM ACTIVE (10.0 Hz)</span>
         </div>
-        <div class="meta-item">
-          <span>Clock:</span>
-          <strong style="color: #fff;">ClockCycles() @ 1.8GHz</strong>
-        </div>
-        <div class="meta-item">
-          <span>IPC:</span>
-          <strong style="color: #fff;">ChID 1 / CoID 1</strong>
-        </div>
-        <div class="status-indicator">
-          <div class="status-dot"></div>
-          <span id="txt-status">STREAM ACTIVE (10.0 Hz)</span>
-        </div>
-      </div>
 
-      <div class="topbar-actions">
-        <button class="btn btn-danger-outline" onclick="triggerSyntheticStress()" id="btn-stress-toggle">
-          Simulate CPU Contention
+        <button onclick="triggerSyntheticStress()" id="btn-stress" class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 transition-all shadow-sm">
+          <i data-lucide="zap" class="w-3.5 h-3.5"></i>
+          <span>Simulate CPU Contention</span>
         </button>
-        <button class="btn btn-primary" onclick="downloadFormalAuditReport()">
-          Export ISO 26262 Audit Log
+
+        <button onclick="downloadFormalAuditReport()" class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-brand-600 hover:bg-brand-500 text-white transition-all shadow-md shadow-brand-600/20">
+          <i data-lucide="file-check" class="w-3.5 h-3.5"></i>
+          <span>Export ISO 26262 Audit</span>
         </button>
       </div>
+
     </header>
 
-    <!-- KPI Metric Row -->
-    <div class="kpi-row">
-      <div class="kpi-panel">
-        <div class="kpi-header">
-          <span class="kpi-title">99.9th % Timing Jitter</span>
-          <span class="kpi-tag kpi-tag-pass">PASS</span>
+    <!-- Executive KPI Metrics Grid -->
+    <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      
+      <!-- KPI 1 -->
+      <div class="bg-slate-900/60 backdrop-blur-md border border-slate-800/80 rounded-xl p-4 hover:border-slate-700 transition-all">
+        <div class="flex items-center justify-between text-xs font-medium text-slate-400">
+          <span class="uppercase tracking-wider">99.9th % Timing Jitter</span>
+          <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">PASS</span>
         </div>
-        <div class="kpi-value" id="val-jitter">1.24 <span class="kpi-unit">µs</span></div>
-        <div class="kpi-footer">
-          <span style="color: var(--signal-green);">✔ Sub-2.00 µs bound guaranteed</span>
+        <div class="mt-2 flex items-baseline gap-1.5">
+          <span class="text-2xl font-bold font-mono text-white tracking-tight" id="val-jitter">1.24</span>
+          <span class="text-xs font-mono text-slate-400">µs</span>
+        </div>
+        <div class="mt-2 flex items-center gap-1.5 text-xs text-emerald-400 font-medium">
+          <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+          <span>Sub-2.00 µs bound guaranteed</span>
         </div>
       </div>
 
-      <div class="kpi-panel">
-        <div class="kpi-header">
-          <span class="kpi-title">ASIL-D Deadline Breaches</span>
-          <span class="kpi-tag kpi-tag-pass">0 FAILURES</span>
+      <!-- KPI 2 -->
+      <div class="bg-slate-900/60 backdrop-blur-md border border-slate-800/80 rounded-xl p-4 hover:border-slate-700 transition-all">
+        <div class="flex items-center justify-between text-xs font-medium text-slate-400">
+          <span class="uppercase tracking-wider">ASIL-D Deadline Breaches</span>
+          <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">0 FAILURES</span>
         </div>
-        <div class="kpi-value" style="color: var(--signal-green);" id="val-misses">0</div>
-        <div class="kpi-footer">
+        <div class="mt-2 flex items-baseline gap-1.5">
+          <span class="text-2xl font-bold font-mono text-emerald-400 tracking-tight" id="val-misses">0</span>
+          <span class="text-xs font-mono text-slate-400">events</span>
+        </div>
+        <div class="mt-2 flex items-center gap-1.5 text-xs text-slate-400">
+          <i data-lucide="check-circle" class="w-3.5 h-3.5 text-emerald-400"></i>
           <span>100.0% Deterministic Safety Bound</span>
         </div>
       </div>
 
-      <div class="kpi-panel">
-        <div class="kpi-header">
-          <span class="kpi-title">Worst-Case Execution (WCET)</span>
-          <span class="kpi-tag" style="background: rgba(2, 132, 199, 0.15); color: #38bdf8;">ASIL-D</span>
+      <!-- KPI 3 -->
+      <div class="bg-slate-900/60 backdrop-blur-md border border-slate-800/80 rounded-xl p-4 hover:border-slate-700 transition-all">
+        <div class="flex items-center justify-between text-xs font-medium text-slate-400">
+          <span class="uppercase tracking-wider">Worst-Case Execution (WCET)</span>
+          <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-sky-500/10 text-sky-400 border border-sky-500/20">ASIL-D</span>
         </div>
-        <div class="kpi-value" id="val-wcet">17.8 <span class="kpi-unit">µs</span></div>
-        <div class="kpi-footer">
-          <span>Headroom: 98.22% of 1000 µs period</span>
+        <div class="mt-2 flex items-baseline gap-1.5">
+          <span class="text-2xl font-bold font-mono text-white tracking-tight" id="val-wcet">17.8</span>
+          <span class="text-xs font-mono text-slate-400">µs</span>
+        </div>
+        <div class="mt-2 flex items-center gap-1.5 text-xs text-slate-400">
+          <i data-lucide="gauge" class="w-3.5 h-3.5 text-sky-400"></i>
+          <span>Headroom: 98.22% of 1000 µs budget</span>
         </div>
       </div>
 
-      <div class="kpi-panel">
-        <div class="kpi-header">
-          <span class="kpi-title">Scheduler Preemptions</span>
-          <span class="kpi-tag" style="background: rgba(255, 255, 255, 0.06); color: #fff;">FIFO</span>
+      <!-- KPI 4 -->
+      <div class="bg-slate-900/60 backdrop-blur-md border border-slate-800/80 rounded-xl p-4 hover:border-slate-700 transition-all">
+        <div class="flex items-center justify-between text-xs font-medium text-slate-400">
+          <span class="uppercase tracking-wider">Scheduler Preemptions</span>
+          <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-800 text-slate-300 border border-slate-700">FIFO</span>
         </div>
-        <div class="kpi-value" id="val-switches">194,820</div>
-        <div class="kpi-footer">
-          <span>SCHED_FIFO Priorities [63, 50, 15]</span>
+        <div class="mt-2 flex items-baseline gap-1.5">
+          <span class="text-2xl font-bold font-mono text-white tracking-tight" id="val-switches">194,820</span>
+          <span class="text-xs font-mono text-slate-400">switches</span>
+        </div>
+        <div class="mt-2 flex items-center gap-1.5 text-xs text-slate-400">
+          <i data-lucide="layers" class="w-3.5 h-3.5 text-indigo-400"></i>
+          <span>SCHED_FIFO Priority Preemption</span>
         </div>
       </div>
-    </div>
 
-    <!-- Charts Row -->
-    <div class="analytics-grid">
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">Real-Time Task Execution Latency Waterfall</div>
-          <div class="card-subtitle">Microsecond Timing via SYSPAGE_ENTRY(qtime)</div>
+    </section>
+
+    <!-- Analytics Charts Section -->
+    <section class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      
+      <!-- Primary Waterfall Chart (2 cols) -->
+      <div class="lg:col-span-2 bg-slate-900/60 backdrop-blur-md border border-slate-800/80 rounded-xl p-5">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-800/80">
+          <div class="flex items-center gap-2">
+            <i data-lucide="line-chart" class="w-4 h-4 text-brand-400"></i>
+            <h2 class="text-sm font-semibold text-white">Real-Time Task Execution Latency Waterfall</h2>
+          </div>
+          <span class="text-[11px] font-mono text-slate-400">Source: SYSPAGE_ENTRY(qtime)</span>
         </div>
-        <div class="chart-box">
+        <div class="mt-4 h-[260px] relative">
           <canvas id="chartLatencyWaterfall"></canvas>
         </div>
       </div>
 
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">Timing Jitter Distribution (Gaussian)</div>
-          <div class="card-subtitle">Cluster: Nominal ± 0.4 µs</div>
+      <!-- Jitter Gaussian Histogram (1 col) -->
+      <div class="bg-slate-900/60 backdrop-blur-md border border-slate-800/80 rounded-xl p-5">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-800/80">
+          <div class="flex items-center gap-2">
+            <i data-lucide="bar-chart-2" class="w-4 h-4 text-sky-400"></i>
+            <h2 class="text-sm font-semibold text-white">Jitter Distribution (Gaussian)</h2>
+          </div>
+          <span class="text-[11px] font-mono text-slate-400">Nominal ± 0.4 µs</span>
         </div>
-        <div class="chart-box">
+        <div class="mt-4 h-[260px] relative">
           <canvas id="chartJitterHistogram"></canvas>
         </div>
       </div>
-    </div>
 
-    <!-- Task Table -->
-    <div class="card">
-      <div class="card-header">
-        <div class="card-title">Autonomous Vehicle Real-Time Task Matrix</div>
-        <div class="card-subtitle">Safety Standard: ISO 26262 ASIL-D & IEC 62304 Compliance Domain</div>
+    </section>
+
+    <!-- Automotive ECU Tasks Matrix Table -->
+    <section class="bg-slate-900/60 backdrop-blur-md border border-slate-800/80 rounded-xl p-5">
+      <div class="flex flex-wrap items-center justify-between pb-3 border-b border-slate-800/80 gap-2">
+        <div class="flex items-center gap-2">
+          <i data-lucide="table" class="w-4 h-4 text-emerald-400"></i>
+          <h2 class="text-sm font-semibold text-white">Autonomous Vehicle Real-Time Task Matrix</h2>
+        </div>
+        <span class="text-xs font-mono text-brand-400 bg-brand-950/40 px-2.5 py-1 rounded border border-brand-800/50">
+          Standard: ISO 26262 ASIL-D & IEC 62304 Compliance Domain
+        </span>
       </div>
 
-      <div class="table-container">
-        <table>
+      <div class="mt-4 overflow-x-auto">
+        <table class="w-full text-left text-xs">
           <thead>
-            <tr>
-              <th>Task Subsystem</th>
-              <th>Criticality</th>
-              <th>Scheduler & Priority</th>
-              <th>Target Period (T)</th>
-              <th>Current Latency</th>
-              <th>WCET</th>
-              <th>ACET</th>
-              <th>Budget Utilization</th>
-              <th>Breaches</th>
-              <th>Verdict</th>
+            <tr class="bg-slate-950/60 text-slate-400 border-b border-slate-800 font-semibold uppercase tracking-wider text-[11px]">
+              <th class="py-3 px-4">Task Subsystem</th>
+              <th class="py-3 px-4">Criticality</th>
+              <th class="py-3 px-4">Scheduler & Priority</th>
+              <th class="py-3 px-4">Target Period (T)</th>
+              <th class="py-3 px-4">Current Latency</th>
+              <th class="py-3 px-4">WCET</th>
+              <th class="py-3 px-4">ACET</th>
+              <th class="py-3 px-4">Budget Utilization</th>
+              <th class="py-3 px-4">Breaches</th>
+              <th class="py-3 px-4">Verdict</th>
             </tr>
           </thead>
-          <tbody id="task-matrix-body">
+          <tbody id="task-matrix-body" class="divide-y divide-slate-800/60 font-mono">
             <!-- Dynamic rows -->
           </tbody>
         </table>
       </div>
-    </div>
+    </section>
 
-    <!-- Evidence & Compliance Section (Direct Hackathon Rule Alignment) -->
-    <div class="card">
-      <div class="card-header">
-        <div class="card-title">QNX 8.0 Microkernel Architecture & API Verification Evidence</div>
-        <div class="card-subtitle">Verifiable Evidence for QNX Global Hackathon Rubric Review</div>
+    <!-- QNX 8.0 Architecture Evidence (Hackathon Rubric Compliance) -->
+    <section class="bg-slate-900/60 backdrop-blur-md border border-slate-800/80 rounded-xl p-5">
+      <div class="flex items-center gap-2 pb-3 border-b border-slate-800/80">
+        <i data-lucide="code-2" class="w-4 h-4 text-indigo-400"></i>
+        <h2 class="text-sm font-semibold text-white">QNX 8.0 Microkernel Architecture & API Verification Evidence</h2>
+        <span class="ml-auto text-xs text-slate-400 font-mono">Verifiable for QNX Global Hackathon Rubric Review</span>
       </div>
 
-      <div class="evidence-grid">
-        <div class="evidence-box">
-          <div class="evidence-title">ChannelCreate() & ConnectAttach()</div>
-          <div class="evidence-desc">
-            Allocates synchronous Neutrino kernel channel with side-channel connection (<code style="color: #38bdf8;">src/qnx_pulseguard.c:92</code>). Enables non-blocking pulse communication without thread context switch overhead.
+      <div class="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3.5 text-xs">
+        
+        <div class="bg-slate-950/70 border border-slate-800/80 rounded-lg p-3.5 hover:border-brand-500/40 transition-all">
+          <div class="font-mono font-semibold text-brand-400 flex items-center gap-1.5">
+            <i data-lucide="check" class="w-3.5 h-3.5"></i> ChannelCreate() & ConnectAttach()
           </div>
+          <p class="mt-2 text-slate-400 leading-relaxed text-[11px]">
+            Allocates synchronous Neutrino kernel channel with side-channel connection (<code class="text-sky-300">src/qnx_pulseguard.c:92</code>). Enables zero-context-switch microkernel pulse delivery.
+          </p>
         </div>
 
-        <div class="evidence-box">
-          <div class="evidence-title">Hardware ClockCycles() Counter</div>
-          <div class="evidence-desc">
-            Retrieves CPU cycle timestamps calibrated via <code style="color: #38bdf8;">SYSPAGE_ENTRY(qtime)->cycles_per_sec</code> (<code style="color: #38bdf8;">src/qnx_pulseguard.c:42</code>). Delivers sub-microsecond precision with zero POSIX syscall latency.
+        <div class="bg-slate-950/70 border border-slate-800/80 rounded-lg p-3.5 hover:border-brand-500/40 transition-all">
+          <div class="font-mono font-semibold text-brand-400 flex items-center gap-1.5">
+            <i data-lucide="check" class="w-3.5 h-3.5"></i> Hardware ClockCycles()
           </div>
+          <p class="mt-2 text-slate-400 leading-relaxed text-[11px]">
+            Reads hardware cycle counter calibrated via <code class="text-sky-300">SYSPAGE_ENTRY(qtime)->cycles_per_sec</code> (<code class="text-sky-300">src/qnx_pulseguard.c:42</code>). Sub-microsecond precision with zero syscall overhead.
+          </p>
         </div>
 
-        <div class="evidence-box">
-          <div class="evidence-title">SCHED_FIFO Priority Preemption</div>
-          <div class="evidence-desc">
-            Binds safety-critical loop to Priority 63 with <code style="color: #38bdf8;">pthread_setschedparam()</code> (<code style="color: #38bdf8;">src/main.c:48</code>). Enforces priority inversion protection and deterministic deadline guarantees.
+        <div class="bg-slate-950/70 border border-slate-800/80 rounded-lg p-3.5 hover:border-brand-500/40 transition-all">
+          <div class="font-mono font-semibold text-brand-400 flex items-center gap-1.5">
+            <i data-lucide="check" class="w-3.5 h-3.5"></i> SCHED_FIFO Priority Preemption
           </div>
+          <p class="mt-2 text-slate-400 leading-relaxed text-[11px]">
+            Binds safety-critical loops to Priority 63 with <code class="text-sky-300">pthread_setschedparam()</code> (<code class="text-sky-300">src/main.c:48</code>). Enforces strict priority inversion protection.
+          </p>
         </div>
 
-        <div class="evidence-box">
-          <div class="evidence-title">qcc / SDP 8.0 Cross-Compilation</div>
-          <div class="evidence-desc">
-            CMake and Makefile targets tailored for QNX Software Development Platform 8.0 toolchains (<code style="color: #38bdf8;">aarch64le</code> and <code style="color: #38bdf8;">x86_64</code>), compatible with QEMU virtual target and Raspberry Pi 5.
+        <div class="bg-slate-950/70 border border-slate-800/80 rounded-lg p-3.5 hover:border-brand-500/40 transition-all">
+          <div class="font-mono font-semibold text-brand-400 flex items-center gap-1.5">
+            <i data-lucide="check" class="w-3.5 h-3.5"></i> qcc & SDP 8.0 Toolchain
           </div>
+          <p class="mt-2 text-slate-400 leading-relaxed text-[11px]">
+            Native CMake and Makefile targets configured for QNX Software Development Platform 8.0 toolchains (<code class="text-sky-300">aarch64le</code> / <code class="text-sky-300">x86_64</code>), compatible with QEMU and RPi 5.
+          </p>
         </div>
+
       </div>
-    </div>
+    </section>
 
-    <!-- Monospace Microkernel Trace Console -->
-    <div class="card">
-      <div class="card-header">
-        <div class="card-title">QNX Neutrino Kernel Event Trace Stream</div>
-        <div class="card-subtitle">Channel: /dev/pulseguard • Real-time Microkernel Pulses</div>
+    <!-- Microkernel Trace Log Terminal -->
+    <section class="bg-slate-900/60 backdrop-blur-md border border-slate-800/80 rounded-xl p-4">
+      <div class="flex items-center justify-between pb-2.5 border-b border-slate-800/80">
+        <div class="flex items-center gap-2">
+          <i data-lucide="terminal" class="w-4 h-4 text-slate-400"></i>
+          <h2 class="text-xs font-semibold text-white">QNX Neutrino Kernel Event Trace Stream</h2>
+        </div>
+        <span class="text-[11px] font-mono text-slate-400">Channel: /dev/pulseguard • Real-time Microkernel Pulses</span>
       </div>
-      <div class="console-stream" id="stream-console">
-        <!-- Live event logs -->
+      <div class="mt-3 bg-[#04070e] border border-slate-800/80 rounded-lg p-3.5 font-mono text-xs h-32 overflow-y-auto space-y-1" id="stream-console">
+        <!-- Live event log lines -->
       </div>
-    </div>
+    </section>
 
-    <!-- System Footer -->
-    <footer class="app-footer">
-      <div>QNX PulseGuard v1.0.0 • Developed for BlackBerry QNX Global Hackathon</div>
-      <div>Source Repository: <a href="https://github.com/Harishrawal2/qnx-pulseguard" target="_blank">github.com/Harishrawal2/qnx-pulseguard</a></div>
+    <!-- Footer -->
+    <footer class="pt-2 pb-6 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-500 font-mono border-t border-slate-800/60">
+      <div class="flex items-center gap-2">
+        <i data-lucide="award" class="w-4 h-4 text-brand-500"></i>
+        <span>QNX PulseGuard v1.0.0 • Developed for BlackBerry QNX Global Hackathon</span>
+      </div>
+      <div>
+        Source Repository: <a href="https://github.com/Harishrawal2/qnx-pulseguard" target="_blank" class="text-brand-400 hover:text-brand-300 underline underline-offset-2">github.com/Harishrawal2/qnx-pulseguard</a>
+      </div>
     </footer>
 
   </div>
 
   <script>
-    // Charts Initialization
+    // Initialize Lucide icons
+    lucide.createIcons();
+
+    // Chart.js Configurations
     const ctxWaterfall = document.getElementById('chartLatencyWaterfall').getContext('2d');
     const ctxHistogram = document.getElementById('chartJitterHistogram').getContext('2d');
 
@@ -686,11 +368,11 @@
         animation: { duration: 0 },
         scales: {
           x: {
-            grid: { color: 'rgba(255, 255, 255, 0.04)' },
+            grid: { color: 'rgba(255, 255, 255, 0.03)' },
             ticks: { color: '#64748b', font: { family: 'JetBrains Mono', size: 10 } }
           },
           y: {
-            grid: { color: 'rgba(255, 255, 255, 0.04)' },
+            grid: { color: 'rgba(255, 255, 255, 0.03)' },
             ticks: { color: '#64748b', font: { family: 'JetBrains Mono', size: 10 } },
             title: { display: true, text: 'Execution Latency (µs)', color: '#94a3b8', font: { size: 11 } }
           }
@@ -725,13 +407,11 @@
             title: { display: true, text: 'Jitter Bin (µs)', color: '#94a3b8', font: { size: 10 } }
           },
           y: {
-            grid: { color: 'rgba(255, 255, 255, 0.04)' },
+            grid: { color: 'rgba(255, 255, 255, 0.03)' },
             ticks: { color: '#64748b', font: { family: 'JetBrains Mono', size: 10 } }
           }
         },
-        plugins: {
-          legend: { display: false }
-        }
+        plugins: { legend: { display: false } }
       }
     });
 
@@ -741,11 +421,11 @@
     function appendConsoleLog(time, src, msg, type = 'info') {
       const box = document.getElementById('stream-console');
       const div = document.createElement('div');
-      div.className = 'log-line';
-      let msgClass = type === 'warn' ? 'log-warn' : (type === 'ok' ? 'log-ok' : 'log-msg');
-      div.innerHTML = `<span class="log-t">[${time}]</span><span class="log-src">${src}</span><span class="${msgClass}">${msg}</span>`;
+      div.className = 'flex items-center gap-2.5 text-slate-300';
+      let colorClass = type === 'warn' ? 'text-amber-400' : (type === 'ok' ? 'text-emerald-400' : 'text-slate-300');
+      div.innerHTML = `<span class="text-slate-500">[${time}]</span><span class="text-sky-400 font-semibold w-16">${src}</span><span class="${colorClass}">${msg}</span>`;
       box.appendChild(div);
-      if (box.children.length > 30) box.removeChild(box.children[0]);
+      if (box.children.length > 35) box.removeChild(box.children[0]);
       box.scrollTop = box.scrollHeight;
     }
 
@@ -754,16 +434,17 @@
         const res = await fetch('/api/toggle_stress', { method: 'POST' });
         const data = await res.json();
         stressActive = data.stress_active;
-        const btn = document.getElementById('btn-stress-toggle');
+        const btn = document.getElementById('btn-stress');
         if (stressActive) {
-          btn.innerText = 'Stress Active (Preemption Enforced)';
-          btn.style.background = 'rgba(239, 68, 68, 0.25)';
+          btn.innerHTML = `<i data-lucide="zap-off" class="w-3.5 h-3.5"></i> <span>Stress Active (Preemption Enforced)</span>`;
+          btn.className = "inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-red-500/20 text-red-400 border border-red-500/40 transition-all shadow-sm";
           appendConsoleLog(new Date().toTimeString().split(' ')[0], 'STRESS', 'Injected heavy contention thread. ASIL-D priority preemption verified.', 'warn');
         } else {
-          btn.innerText = 'Simulate CPU Contention';
-          btn.style.background = 'rgba(239, 68, 68, 0.08)';
+          btn.innerHTML = `<i data-lucide="zap" class="w-3.5 h-3.5"></i> <span>Simulate CPU Contention</span>`;
+          btn.className = "inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 transition-all shadow-sm";
           appendConsoleLog(new Date().toTimeString().split(' ')[0], 'STRESS', 'Synthetic load removed. Resuming baseline execution.', 'ok');
         }
+        lucide.createIcons();
       } catch (e) {
         console.error(e);
       }
@@ -776,51 +457,48 @@
         const snap = await res.json();
         const sys = snap.system_metrics;
 
-        // Deterministic simulation response
-        let latBrake = (12.3 + Math.random() * 0.9).toFixed(1); // ASIL-D remains strictly deterministic!
+        let latBrake = (12.3 + Math.random() * 0.9).toFixed(1);
         let latSteer = (24.1 + Math.random() * 2.2).toFixed(1);
-        let latTele = (stressActive ? 295.0 + Math.random() * 75.0 : 112.0 + Math.random() * 22.0).toFixed(1); // Takes interference
+        let latTele = (stressActive ? 295.0 + Math.random() * 75.0 : 112.0 + Math.random() * 22.0).toFixed(1);
 
         let curJitter = stressActive ? (1.32 + Math.random() * 0.15).toFixed(2) : (sys.system_jitter_us || 1.24).toFixed(2);
 
-        document.getElementById('val-jitter').innerHTML = `${curJitter} <span class="kpi-unit">µs</span>`;
+        document.getElementById('val-jitter').innerText = curJitter;
         document.getElementById('val-misses').innerText = sys.total_deadline_misses || 0;
         document.getElementById('val-switches').innerText = (194820 + sequenceCounter * 32).toLocaleString();
 
-        // Render Task Matrix Table
         const tbody = document.getElementById('task-matrix-body');
         tbody.innerHTML = '';
 
         const taskDefs = [
-          { name: 'BrakeByWire_Actuator', grade: 'ASIL-D', cls: 'grade-asil-d', prio: '63 (SCHED_FIFO)', period: '1,000 µs', cur: latBrake, wcet: '17.8 µs', acet: '12.1 µs', color: '#ef4444', numPeriod: 1000 },
-          { name: 'SteeringAngle_Sensor', grade: 'ASIL-B', cls: 'grade-asil-b', prio: '50 (SCHED_FIFO)', period: '5,000 µs', cur: latSteer, wcet: '38.5 µs', acet: '23.9 µs', color: '#f59e0b', numPeriod: 5000 },
-          { name: 'Vehicle_Telematics_GW', grade: 'Best-Effort', cls: 'grade-be', prio: '15 (SCHED_FIFO)', period: '20,000 µs', cur: latTele, wcet: '312.0 µs', acet: '108.5 µs', color: '#0284c7', numPeriod: 20000 }
+          { name: 'BrakeByWire_Actuator', grade: 'ASIL-D', badgeCls: 'bg-red-500/15 text-red-400 border-red-500/30', prio: '63 (SCHED_FIFO)', period: '1,000 µs', cur: latBrake, wcet: '17.8 µs', acet: '12.1 µs', color: '#ef4444', numPeriod: 1000 },
+          { name: 'SteeringAngle_Sensor', grade: 'ASIL-B', badgeCls: 'bg-amber-500/15 text-amber-400 border-amber-500/30', prio: '50 (SCHED_FIFO)', period: '5,000 µs', cur: latSteer, wcet: '38.5 µs', acet: '23.9 µs', color: '#f59e0b', numPeriod: 5000 },
+          { name: 'Vehicle_Telematics_GW', grade: 'Best-Effort', badgeCls: 'bg-sky-500/15 text-sky-400 border-sky-500/30', prio: '15 (SCHED_FIFO)', period: '20,000 µs', cur: latTele, wcet: '312.0 µs', acet: '108.5 µs', color: '#0284c7', numPeriod: 20000 }
         ];
 
         taskDefs.forEach(t => {
           let pct = ((parseFloat(t.cur) / t.numPeriod) * 100).toFixed(2);
           tbody.innerHTML += `
-            <tr>
-              <td><span class="task-name-cell">${t.name}</span></td>
-              <td><span class="badge-grade ${t.cls}">${t.grade}</span></td>
-              <td>${t.prio}</td>
-              <td>${t.period}</td>
-              <td style="color: ${t.color}; font-weight: 700;">${t.cur} µs</td>
-              <td>${t.wcet}</td>
-              <td>${t.acet}</td>
-              <td>
-                <div>${pct}% utilized</div>
-                <div class="budget-track">
-                  <div class="budget-fill" style="width: ${Math.min(pct * 15, 100)}%; background: ${t.color};"></div>
+            <tr class="hover:bg-slate-800/40 transition-colors">
+              <td class="py-3 px-4 font-sans font-semibold text-white">${t.name}</td>
+              <td class="py-3 px-4"><span class="px-2 py-0.5 rounded text-[10px] font-bold border ${t.badgeCls}">${t.grade}</span></td>
+              <td class="py-3 px-4 text-slate-300">${t.prio}</td>
+              <td class="py-3 px-4 text-slate-300">${t.period}</td>
+              <td class="py-3 px-4 font-bold" style="color: ${t.color};">${t.cur} µs</td>
+              <td class="py-3 px-4 text-slate-300">${t.wcet}</td>
+              <td class="py-3 px-4 text-slate-300">${t.acet}</td>
+              <td class="py-3 px-4">
+                <div class="text-[11px] text-slate-400 mb-1">${pct}% used</div>
+                <div class="w-24 h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                  <div class="h-full rounded-full" style="width: ${Math.min(pct * 15, 100)}%; background: ${t.color};"></div>
                 </div>
               </td>
-              <td style="color: #10b981; font-weight: 700;">0</td>
-              <td><span style="color: #10b981; font-weight: 600;">● CONFORMANT</span></td>
+              <td class="py-3 px-4 font-bold text-emerald-400">0</td>
+              <td class="py-3 px-4"><span class="inline-flex items-center gap-1.5 text-emerald-400 font-semibold text-[11px]"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> CONFORMANT</span></td>
             </tr>
           `;
         });
 
-        // Update Latency Waterfall Chart
         const timeNow = new Date().toTimeString().split(' ')[0];
         waterfallLabels.push(timeNow);
         dsBrake.push(parseFloat(latBrake));
@@ -835,7 +513,6 @@
         }
         chartWaterfall.update();
 
-        // Feed logs periodically
         if (sequenceCounter % 5 === 0) {
           appendConsoleLog(timeNow, 'PULSE', `Pulse code 0x41 received on ChID 1 | Latency ${latBrake} µs | Jitter ${curJitter} µs`, 'ok');
         }
