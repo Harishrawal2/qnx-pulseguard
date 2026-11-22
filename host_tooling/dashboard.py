@@ -134,11 +134,11 @@ class TelemetryState:
 
     def _generate_ipc_bench_data(self):
         return [
-            {"payload_bytes": 64, "iterations": 10000, "min_us": 0.85, "avg_us": 1.12, "p95_us": 1.45, "max_us": 2.80, "throughput_msg_sec": 892857, "bandwidth_mb_sec": 54.5},
-            {"payload_bytes": 256, "iterations": 10000, "min_us": 0.92, "avg_us": 1.18, "p95_us": 1.52, "max_us": 2.95, "throughput_msg_sec": 847457, "bandwidth_mb_sec": 206.9},
-            {"payload_bytes": 1024, "iterations": 10000, "min_us": 1.05, "avg_us": 1.34, "p95_us": 1.78, "max_us": 3.40, "throughput_msg_sec": 746268, "bandwidth_mb_sec": 728.8},
-            {"payload_bytes": 4096, "iterations": 10000, "min_us": 1.42, "avg_us": 1.85, "p95_us": 2.40, "max_us": 4.15, "throughput_msg_sec": 540540, "bandwidth_mb_sec": 2111.5},
-            {"payload_bytes": 16384, "iterations": 10000, "min_us": 2.85, "avg_us": 3.65, "p95_us": 4.80, "max_us": 6.90, "throughput_msg_sec": 273972, "bandwidth_mb_sec": 4280.8}
+            {"payload_bytes": 64, "iterations": 10000, "min_us": 1.49, "avg_us": 5.28, "p95_us": 3.72, "max_us": 632.90, "throughput_msg_sec": 189474, "bandwidth_mb_sec": 11.56},
+            {"payload_bytes": 256, "iterations": 10000, "min_us": 1.51, "avg_us": 5.78, "p95_us": 3.83, "max_us": 613.87, "throughput_msg_sec": 173060, "bandwidth_mb_sec": 42.25},
+            {"payload_bytes": 1024, "iterations": 10000, "min_us": 1.53, "avg_us": 5.66, "p95_us": 3.90, "max_us": 653.71, "throughput_msg_sec": 176817, "bandwidth_mb_sec": 172.67},
+            {"payload_bytes": 4096, "iterations": 10000, "min_us": 1.70, "avg_us": 5.89, "p95_us": 4.17, "max_us": 838.81, "throughput_msg_sec": 169815, "bandwidth_mb_sec": 663.34},
+            {"payload_bytes": 16384, "iterations": 10000, "min_us": 2.12, "avg_us": 7.37, "p95_us": 5.10, "max_us": 779.34, "throughput_msg_sec": 135606, "bandwidth_mb_sec": 2118.84}
         ]
 
     def _seed_initial_history(self):
@@ -228,6 +228,7 @@ class TelemetryState:
                 asil_str = lvl_names[lvl] if lvl < len(lvl_names) else "Unknown"
                 period_us = period / 1000.0
                 lat_us = avg / 1000.0
+                worst_us = max(worst / 1000.0, lat_us)
                 latencies[name] = round(lat_us, 1)
                 updated_tasks.append({
                     "task_id": tid,
@@ -237,8 +238,8 @@ class TelemetryState:
                     "target_period_us": period_us,
                     "deadline_us": period_us,
                     "current_latency_us": round(lat_us, 1),
-                    "wcet_us": round(worst / 1000.0, 1),  # Maximum observed execution time
-                    "acet_us": round(avg / 1000.0, 1),
+                    "wcet_us": round(worst_us, 1),  # Maximum observed execution time
+                    "acet_us": round(lat_us, 1),    # Average execution time
                     "deadline_misses": tmisses,
                     "budget_utilization_pct": round((lat_us / max(period_us, 1.0)) * 100, 2),
                     "status": "NOMINAL" if healthy else "BREACH"
@@ -314,6 +315,13 @@ class TelemetryState:
             return {
                 "data_mode": self.data_mode,
                 "data_source": self.data_source,
+                "data_provenance": {
+                    "task_latencies": "NATIVE_QNX_MEASURED (Reference Workloads)" if self.data_mode == "REAL_QNX" else "SYNTHETIC_REFERENCE_MODEL",
+                    "ipc_benchmark_table": "NATIVE_QNX_VIRTUALBOX_BASELINE",
+                    "context_switches_counter": "SYNTHETIC_HOST_INCREMENT",
+                    "system_jitter": "HOST_CALCULATED_ESTIMATE",
+                    "global_percentiles": "CALIBRATED_BASELINE_MODEL"
+                },
                 "connected": self.connected,
                 "qnx_target_info": self.qnx_target_info,
                 "system_metrics": self.system_metrics,
@@ -425,12 +433,12 @@ class ApiAndStaticServer(SimpleHTTPRequestHandler):
                 if st:
                     telemetry_state.event_log.append({
                         "time": now, "level": "WARN", "source": "STRESS",
-                        "msg": "Synthetic CPU contention injected. Validating SCHED_FIFO preemption bound."
+                        "msg": "Simulated host-side CPU contention injected (timing exploration scenario)."
                     })
                 else:
                     telemetry_state.event_log.append({
                         "time": now, "level": "INFO", "source": "STRESS",
-                        "msg": "Synthetic contention cleared. Baseline task execution restored."
+                        "msg": "Simulated host-side contention cleared. Baseline timing restored."
                     })
             self.send_response(200)
             self.send_header("Content-Type", "application/json")

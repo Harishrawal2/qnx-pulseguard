@@ -19,7 +19,7 @@
 |  0:25 - 0:55   |  QNX SDP 8.0 Toolchain & Target VM Boot (`mkqnximage` / VirtualBox)  |
 |  0:55 - 1:30   |  Native Synchronous IPC Benchmark (`MsgSend` / `MsgReceive`)          |
 |  1:30 - 2:10   |  Live UDP Telemetry Stream & Real-Time Dashboard (`REAL QNX MODE`)    |
-|  2:10 - 2:35   |  Simulate CPU Contention & `SCHED_FIFO` Priority Preemption          |
+|  2:10 - 2:35   |  Simulated Contention & Dashboard Timing Exploration                 |
 |  2:35 - 2:45   |  Audit Report Export & Conclusion                                     |
 +---------------------------------------------------------------------------------------+
 ```
@@ -27,9 +27,9 @@
 ---
 
 ### Segment 1: Introduction & Problem Statement (0:00 – 0:25 | 25s)
-- **Visual:** Split screen or title card: "QNX PulseGuard — Real-Time Deterministic Latency & Timing Analysis Tool for QNX SDP 8.0". Transition to live dashboard.
+- **Visual:** Split screen or title card: "QNX PulseGuard — Real-Time Latency & Timing Analysis Tool for QNX SDP 8.0". Transition to live dashboard.
 - **Narration:**
-  > "In autonomous driving and automotive control systems, deterministic timing is safety-critical. On modern multicore platforms running QNX SDP 8.0, safety-critical tasks like Brake-by-Wire share hardware resources with background telematics. Proving microsecond determinism and catching deadline breaches before deployment is essential. This is **QNX PulseGuard**."
+  > "In embedded and automotive software systems, understanding real-time timing behavior is essential. On modern platforms running QNX SDP 8.0, real-time tasks like Brake-by-Wire models share compute resources with background telematics. Monitoring execution latencies, timing variations, and deadline margins during development is crucial. This is **QNX PulseGuard**."
 
 ---
 
@@ -44,8 +44,8 @@
 - **Visual:** In the SSH terminal, execute `/tmp/qnx_ipc_bench`. Highlight the formatted output table displaying 64B to 16KB results.
 - **Narration:**
   > "Next, let's run our native synchronous IPC benchmark directly on the QNX target. 
-  > This exercises QNX's core message-passing primitives: `ChannelCreate`, `ConnectAttach`, and synchronous `MsgSend`, `MsgReceive`, and `MsgReply` across 10,000 iterations per payload.
-  > On 64-byte automotive control messages, we observe minimum round-trip latencies of just 1.48 microseconds, a 95th-percentile of 3.78 microseconds, and peak throughput exceeding 204,000 round-trips per second. This demonstrates the ultra-low latency of the QNX microkernel."
+  > This exercises QNX's core message-passing primitives: `ChannelCreate`, `ConnectAttach`, and synchronous `MsgSend`, `MsgReceive`, and `MsgReply` across 10,000 iterations per payload tier.
+  > Running inside our QNX 8.0 VirtualBox environment, 64-byte messages achieve minimum round-trip latencies of approximately 1.49 microseconds, a 95th-percentile of 3.72 microseconds, and sustained throughput exceeding 189,000 round-trips per second. This provides empirical baseline measurements of synchronous microkernel message passing."
 
 ---
 
@@ -54,23 +54,24 @@
 - **Narration:**
   > "Now, we launch the native PulseGuard telemetry daemon on QNX. It broadcasts binary UDP frames at 10 Hz directly to our host workstation.
   > Notice the dashboard immediately recognizes the incoming hardware stream and switches to **REAL QNX MODE**.
-  > Using zero-syscall timestamping with `ClockCycles()` and `SYSPAGE_ENTRY(qtime)`, PulseGuard monitors three real-time automotive tasks under `SCHED_FIFO` priorities: BrakeByWire at priority 63, SteeringAngle at priority 50, and Telematics at priority 15. All three run nominally within their execution budgets."
+  > Using zero-syscall timestamping with `ClockCycles()` and `SYSPAGE_ENTRY(qtime)`, PulseGuard monitors three reference automotive execution loops under `SCHED_FIFO` priorities: BrakeByWire reference at priority 63, SteeringAngle reference at priority 50, and Telematics reference at priority 15. All three execute nominally within their allocated period budgets."
 
 ---
 
-### Segment 5: CPU Contention & Priority Preemption (2:10 – 2:35 | 25s)
-- **Visual:** Click the **Simulate CPU Contention** button. Show state flip to `Contention Active`. Point out the slight jitter on the lowest-priority telematics task while BrakeByWire stays rock-solid.
+### Segment 5: Simulated Contention & Dashboard Timing Exploration (2:10 – 2:35 | 25s)
+- **Visual:** Click the **Simulate CPU Contention** button. Show state update to `Simulated Contention Active`. Point out the simulated latency increase on the best-effort telematics reference task while the high-priority reference tasks remain within their period deadlines.
 - **Narration:**
-  > "Let's inject synthetic CPU contention. Notice that our best-effort Telematics task experiences slight latency increases due to resource contention. 
-  > But our highest-priority safety task—BrakeByWire at priority 63—maintains zero deadline breaches and steady sub-microsecond determinism. This proves `SCHED_FIFO` priority preemption in action."
+  > "For exploring developer tooling workflows, the dashboard also includes a simulated contention toggle. 
+  > Clicking 'Simulate CPU Contention' allows developers to test how the UI handles timing variances and deadline monitoring during heavy workloads.
+  > Notice the status updates to 'Simulated Contention Active', and the event log tracks the simulated scenario—illustrating how host tooling can visualize priority headroom."
 
 ---
 
 ### Segment 6: Timing Evidence Report & Conclusion (2:35 – 2:45 | 10s)
 - **Visual:** Click the **Reports** tab, click **Export Timing Evidence Report** (JSON downloads). Show GitHub repository tab (`https://github.com/Harishrawal2/qnx-pulseguard`).
 - **Narration:**
-  > "Finally, developers can export complete timing evidence reports in JSON and CSV for automated CI/CD safety verification. 
-  > QNX PulseGuard: deterministic timing visibility for the next generation of software-defined vehicles on QNX SDP 8.0."
+  > "Finally, developers can export complete timing evidence reports in JSON and CSV for automated CI/CD regression tracking. 
+  > QNX PulseGuard: real-time timing visibility and host tooling for QNX SDP 8.0."
 
 ---
 

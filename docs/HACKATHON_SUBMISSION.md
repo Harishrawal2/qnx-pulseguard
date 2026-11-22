@@ -13,7 +13,7 @@
 ---
 
 ## 2. Elevator Pitch
-QNX PulseGuard is a real-time latency and timing analysis platform designed specifically for QNX SDP 8.0 applications. By pairing a native C telemetry agent utilizing QNX Neutrino microkernel primitives (`ClockCycles()`, `SYSPAGE_ENTRY(qtime)`, `ChannelCreate()`, `ConnectAttach()`, `MsgSend/MsgReceive/MsgReply`, and `pthread_setschedparam()`) with a responsive dark-mode host dashboard, PulseGuard provides sub-microsecond timing visibility, deadline breach monitoring, and priority preemption analysis for mission-critical automotive workloads.
+QNX PulseGuard is a real-time latency and timing analysis platform designed specifically for QNX SDP 8.0 applications. By pairing a native C telemetry agent utilizing QNX Neutrino microkernel primitives (`ClockCycles()`, `SYSPAGE_ENTRY(qtime)`, `ChannelCreate()`, `ConnectAttach()`, `MsgSend/MsgReceive/MsgReply`, and `pthread_setschedparam()`) with a responsive dark-mode host dashboard, PulseGuard provides microsecond timing visibility, deadline breach monitoring, and timing behavior analysis using reference automotive workloads.
 
 ---
 
@@ -36,7 +36,7 @@ PulseGuard directly integrates key QNX Neutrino RTOS capabilities:
 - **`ClockCycles()` & `SYSPAGE_ENTRY(qtime)->cycles_per_sec`**: Direct CPU cycle timing without syscall overhead.
 - **`ChannelCreate()` & `ConnectAttach()`**: Microkernel channel and side-channel attachment.
 - **`MsgSend()`, `MsgReceive()`, `MsgReply()`**: Synchronous message passing evaluation.
-- **`pthread_setschedparam()` with `SCHED_FIFO`**: Real-time priority preemption verification.
+- **`pthread_setschedparam()` with `SCHED_FIFO`**: Real-time thread priority assignment across reference tasks.
 - **`mkqnximage` VirtualBox Deployment:** Automated creation of bootable QNX 8.0 virtual machine targets using official QNX SDP 8.0 packaging tools.
 
 ---
@@ -87,7 +87,7 @@ QNX PulseGuard consists of two integrated components:
 
 ### Accomplishments that we're proud of:
 - **Verified Execution on Live QNX 8.0:** Successfully cross-compiled and executed the native binaries on a real QNX Neutrino RTOS 8.0.0 target (`192.168.56.102`).
-- **Microkernel IPC Performance:** Measured empirical round-trip message passing latencies as low as **1.48 µs** and sustained throughput over **204,000 round-trips/second**.
+- **Microkernel IPC Performance:** Measured empirical round-trip synchronous message passing latencies on QNX 8.0 VirtualBox of **1.49 µs** minimum and sustained throughput exceeding **189,000 round-trips/second**.
 - **Live Telemetry Pipeline:** Streaming continuous real-time frames from the QNX target to the host dashboard, achieving zero deadline breaches under nominal operations.
 - **Comprehensive Quality:** 16 automated tests covering API schemas, security constraints, and statistical math.
 

@@ -128,7 +128,7 @@ int pulseguard_register_task(const char *name, CriticalityLevel level, int prior
     t->target_period_ns = period_ns;
     t->best_latency_ns = (uint64_t)-1;
     t->worst_latency_ns = 0;
-    t->avg_latency_ns = period_ns;
+    t->avg_latency_ns = 0;
     t->deadline_misses = 0;
     t->total_executions = 0;
     t->is_healthy = true;
@@ -151,15 +151,20 @@ void pulseguard_record_execution(int task_id, uint64_t execution_latency_ns, boo
 
     TaskTelemetry *t = &g_current_frame.tasks[idx];
     t->total_executions++;
-    if (execution_latency_ns > t->worst_latency_ns) {
+    if (t->total_executions == 1) {
         t->worst_latency_ns = execution_latency_ns;
-    }
-    if (execution_latency_ns < t->best_latency_ns) {
         t->best_latency_ns = execution_latency_ns;
+        t->avg_latency_ns = execution_latency_ns;
+    } else {
+        if (execution_latency_ns > t->worst_latency_ns) {
+            t->worst_latency_ns = execution_latency_ns;
+        }
+        if (execution_latency_ns < t->best_latency_ns) {
+            t->best_latency_ns = execution_latency_ns;
+        }
+        /* Exponential Moving Average for jitter smoothing */
+        t->avg_latency_ns = (uint64_t)(0.9 * (double)t->avg_latency_ns + 0.1 * (double)execution_latency_ns);
     }
-
-    /* Exponential Moving Average for jitter smoothing */
-    t->avg_latency_ns = (uint64_t)(0.9 * (double)t->avg_latency_ns + 0.1 * (double)execution_latency_ns);
 
     if (missed_deadline) {
         t->deadline_misses++;

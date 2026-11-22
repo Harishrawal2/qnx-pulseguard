@@ -244,7 +244,7 @@
           </div>
           <div class="mt-2.5 flex items-center gap-1.5 text-xs text-emerald-400 font-medium">
             <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-            <span>Sub-2.00 µs bound guaranteed</span>
+            <span>Calibrated baseline reference model</span>
           </div>
         </div>
 
@@ -298,19 +298,19 @@
               <div class="w-6 h-6 rounded-md bg-indigo-500/10 flex items-center justify-center text-indigo-400">
                 <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 12-8.58 3.91a2 2 0 0 1-1.66 0L2 12"/><path d="m22 17-8.58 3.91a2 2 0 0 1-1.66 0L2 17"/></svg>
             </div>
-            <span class="text-[11px] font-bold text-slate-300 tracking-wider uppercase">Scheduler Preemptions</span>
+            <span class="text-[11px] font-bold text-slate-300 tracking-wider uppercase">Estimated Dispatch Cycles</span>
           </div>
           <span class="px-2.5 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-800 text-slate-300 border border-slate-700">
-            FIFO
+            ESTIMATED
           </span>
         </div>
         <div class="mt-3 flex items-baseline gap-1.5">
           <span class="text-3xl md:text-4xl font-extrabold font-mono text-white tracking-tight" id="val-switches">210,788</span>
-          <span class="text-sm font-mono text-slate-400">switches</span>
+          <span class="text-sm font-mono text-slate-400">cycles</span>
         </div>
         <div class="mt-2.5 flex items-center gap-1.5 text-xs text-slate-400 font-medium">
           <svg class="w-3.5 h-3.5 text-indigo-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/></svg>
-          <span>SCHED_FIFO Priority Preemption</span>
+          <span>Host-simulated dispatch cycles (untraced)</span>
         </div>
       </div>
 
@@ -423,12 +423,13 @@
         <div class="flex flex-wrap items-center justify-between pb-3 border-b border-slate-800/80 gap-2">
           <div class="flex items-center gap-2.5">
             <svg class="w-4 h-4 text-cyan-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-            <h2 class="text-sm font-bold text-white">QNX Neutrino Synchronous IPC Benchmark (MsgSend -> MsgReceive -> MsgReply)</h2>
+            <h2 class="text-sm font-bold text-white">QNX Neutrino Synchronous IPC Benchmark (Measured Reference Baseline)</h2>
           </div>
           <button onclick="fetchIpcBenchmark()" class="px-3 py-1 rounded-lg text-xs font-mono font-semibold bg-cyan-950 text-cyan-300 border border-cyan-700/60 hover:bg-cyan-900 transition-all">
             ↻ Refresh IPC Benchmark
           </button>
         </div>
+        <p class="text-[11px] text-slate-400 mt-2 font-sans">ℹ️ Baseline measurements captured on QNX Neutrino 8.0 (VirtualBox x86_64). Live target benchmarking can be run directly via <code class="text-cyan-400">/tmp/qnx_ipc_bench</code> in the QNX SSH terminal.</p>
 
         <div class="mt-4 overflow-x-auto">
           <table class="w-full text-left text-xs font-mono">
@@ -779,13 +780,13 @@
         stressActive = data.stress_active;
         const btn = document.getElementById('btn-contention');
         if (stressActive) {
-          btn.innerHTML = `<svg class="w-3.5 h-3.5 text-red-400 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> <span class="text-red-400">Stress Active (Preemption Verified)</span>`;
-          btn.className = "inline-flex items-center gap-2 px-4 py-2 rounded-full bg-red-950/60 border border-red-500/50 text-red-400 text-xs font-semibold shadow-lg shadow-red-500/20";
-          appendConsoleLog(new Date().toTimeString().split(' ')[0], 'STRESS', 'Injected CPU contention thread. ASIL-D priority preemption verified.', 'warn');
+          btn.innerHTML = `<svg class="w-3.5 h-3.5 text-amber-400 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> <span class="text-amber-400">Simulated Contention Active</span>`;
+          btn.className = "inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-950/60 border border-amber-500/50 text-amber-400 text-xs font-semibold shadow-lg shadow-amber-500/20";
+          appendConsoleLog(new Date().toTimeString().split(' ')[0], 'STRESS', 'Injected simulated host-side CPU contention.', 'warn');
         } else {
           btn.innerHTML = `<svg class="w-3.5 h-3.5 text-slate-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> <span>Simulate CPU Contention</span>`;
           btn.className = "inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#131b2e] hover:bg-[#1a253e] text-slate-200 border border-slate-700/80 text-xs font-semibold transition-all shadow-sm";
-          appendConsoleLog(new Date().toTimeString().split(' ')[0], 'STRESS', 'Synthetic load removed. Resuming baseline execution.', 'ok');
+          appendConsoleLog(new Date().toTimeString().split(' ')[0], 'STRESS', 'Simulated contention removed. Baseline timing restored.', 'ok');
         }
       } catch (e) {
         console.error(e);
