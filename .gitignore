@@ -1,0 +1,38 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C / C++ Build artifacts
+build/
+bin/
+*.o
+*.obj
+*.exe
+*.dll
+*.so
+*.dylib
+qnx_pulseguard
+qnx_ipc_bench
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+
+# Environment and secrets
+.env
+.env.local
+*.pem
+*.key
+
+# Test & coverage artifacts
+.pytest_cache/
+.coverage
+htmlcov/
+*.log
+
+# QNX SDP local configuration & workspace
+.qnx/
+*.bsp
+*.ifs

@@ -1,19 +1,21 @@
 #!/usr/bin/env python3
 """
 PulseGuard Statistical Engine & Binary Frame Unit Tests
-Tests percentile calculations, binary frame struct serialization, and deadline detection.
+Tests percentile calculations, binary frame struct serialization, deadline detection,
+partial benchmark sample handling, and maximum observed execution time tracking.
 """
 
 import unittest
 import struct
 import numpy as np
 
-# Struct format matching include/qnx_pulseguard.h
 HEADER_FORMAT = "<4sIQIIQd?"
 TASK_FORMAT = "<32sIiIQQQQQQd?"
 
-def calculate_percentiles(samples):
-    """Calculates P50, P95, P99, P99.9 latencies in microseconds"""
+def calculate_percentiles(samples, valid_count=None):
+    """Calculates P50, P95, P99, P99.9 latencies in microseconds only over valid samples"""
+    if valid_count is not None:
+        samples = samples[:valid_count]
     if not samples:
         return {"p50": 0.0, "p95": 0.0, "p99": 0.0, "p99_9": 0.0}
     s = sorted(samples)
@@ -60,7 +62,7 @@ class TestStatisticsAndProtocol(unittest.TestCase):
         """Verify TaskTelemetry binary record serialization"""
         name = b"BrakeByWire_Actuator\x00".ljust(32, b'\x00')
         tid = 1
-        level = 2 # ASIL-D
+        level = 2 # ASIL-D Reference
         prio = 63
         period_ns = 1000000 # 1 ms
         worst_ns = 17800
@@ -82,10 +84,8 @@ class TestStatisticsAndProtocol(unittest.TestCase):
 
     def test_03_percentile_calculations(self):
         """Verify mathematical accuracy of latency percentiles"""
-        # Create deterministic synthetic sample distribution (1000 samples around 12 us)
         np.random.seed(42)
         samples = list(np.random.normal(loc=12.0, scale=0.8, size=1000))
-        # Add a couple outliers for P99
         samples.append(18.5)
         samples.append(21.2)
 
@@ -98,15 +98,41 @@ class TestStatisticsAndProtocol(unittest.TestCase):
 
     def test_04_deadline_evaluation(self):
         """Verify deadline detection and timing headroom calculations"""
-        # Case 1: Nominal execution well within 1000 us deadline
         missed, util = evaluate_deadline(12.4, 1000.0)
         self.assertFalse(missed)
         self.assertAlmostEqual(util, 1.24, places=2)
 
-        # Case 2: Deadline violation
         missed, util = evaluate_deadline(1050.0, 1000.0)
         self.assertTrue(missed)
         self.assertEqual(util, 105.0)
+
+    def test_05_max_observed_execution_time_tracking(self):
+        """Verify tracking of high-water mark / maximum observed execution time"""
+        observed_samples = [12.1, 14.3, 11.8, 17.8, 13.2, 12.0]
+        max_observed = max(observed_samples)
+        self.assertEqual(max_observed, 17.8)
+
+    def test_06_partial_benchmark_sample_handling(self):
+        """Verify that partial benchmark failures calculate statistics only over successful samples"""
+        allocated_capacity = 100
+        buffer = [0.0] * allocated_capacity
+        
+        # Simulate partial execution where only 45 samples were successfully collected
+        valid_samples = [1.1 + (i * 0.02) for i in range(45)]
+        for i, val in enumerate(valid_samples):
+            buffer[i] = val
+        
+        # If we wrongly sorted the full buffer, index 0 would be 0.0 (uninitialized)
+        stats = calculate_percentiles(buffer, valid_count=45)
+        self.assertGreater(stats["p50"], 1.0)
+        self.assertAlmostEqual(stats["p50"], float(np.percentile(valid_samples, 50)), places=2)
+
+    def test_07_zero_sample_graceful_handling(self):
+        """Verify that zero samples cleanly return 0.0 metrics without exception"""
+        stats = calculate_percentiles([], valid_count=0)
+        self.assertEqual(stats["p50"], 0.0)
+        self.assertEqual(stats["p95"], 0.0)
+        self.assertEqual(stats["p99"], 0.0)
 
 if __name__ == "__main__":
     unittest.main()

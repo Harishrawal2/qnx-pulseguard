@@ -12,7 +12,10 @@
 
 **QNX PulseGuard** is a real-time deterministic performance monitoring and timing analysis platform engineered for **BlackBerry QNX Software Development Platform (SDP) 8.0**.
 
-In autonomous automotive systems (ISO 26262 ASIL-D), hard real-time tasks such as Brake-by-Wire and Steering Control must execute deterministically without deadline breaches—even when competing with lower-priority background telematics under heavy CPU contention.
+> [!NOTE]
+> **Disclaimer:** Reference workloads for developer performance analysis. This software does not establish ISO 26262 compliance or safety certification.
+
+In autonomous automotive systems (ISO 26262 ASIL-D reference models), hard real-time tasks such as Brake-by-Wire and Steering Control must execute deterministically without deadline breaches—even when competing with lower-priority background telematics under heavy CPU contention.
 
 PulseGuard pairs an ultra-low-overhead native QNX C telemetry agent with an enterprise host dashboard to deliver **sub-microsecond execution latency measurement**, **Gaussian jitter distribution analysis**, **microkernel IPC benchmarking**, and **exportable performance verification evidence**.
 

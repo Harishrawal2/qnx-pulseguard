@@ -37,7 +37,7 @@
 ---
 
 ## 2:25 – 2:45 | Audit Export & Conclusion
-- **Visual:** Click the **Reports** tab and demonstrate clicking **Export ISO 26262 Audit** to download the JSON report.
+- **Visual:** Click the **Reports** tab and demonstrate clicking **Export Timing Evidence Report** to download the JSON report.
 - **Narrator:**
   > "Finally, engineering teams can export full performance audit reports in JSON and CSV formats for integration into their continuous verification pipelines. 
   > QNX PulseGuard delivers actionable, deterministic timing visibility for the next generation of software-defined vehicles on QNX SDP 8.0."
